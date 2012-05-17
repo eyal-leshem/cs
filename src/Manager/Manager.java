@@ -9,7 +9,10 @@ import message.Message;
 public class Manager {
 
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		
+		
+		
 		Communicate net=new Communicate(); 
 		Parser parser=new Parser(); 
 		ImplementorManager impManager=ImplementorManager.getInstance(); 
@@ -21,10 +24,7 @@ public class Manager {
 				Message retMsg=impManager.commitTask(msg);
 				String jsonMsg=parser.buildMessage(retMsg); 
 				net.sendResponse(jsonMsg); 
-			}
-			
-			
-		
+			}		
 			
 			
 			try {

@@ -1,6 +1,7 @@
 package Implemtor;
 
 import java.io.ObjectInputStream.GetField;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ public class ImplementorManager {
 	Map<String,Implementor> implemtors=new HashMap<String,Implementor>();
 	static ImplementorManager inst=null; 
 	
-	public static ImplementorManager getInstance(){
+	public static ImplementorManager getInstance() throws Exception{
 		if(inst==null){
 			return new ImplementorManager(); 
 		}
@@ -19,8 +20,17 @@ public class ImplementorManager {
 		
 	}
 	
-	private ImplementorManager() {
-		// TODO Auto-generated constructor stub
+	private ImplementorManager() throws Exception {
+		PluginFactory pluginFactory=new PluginFactory(); 
+		ArrayList<Implementor>  implemtorArr=pluginFactory.getClassArr("c:\\temp\\agentService\\plugins"); 
+		for (Implementor implementor : implemtorArr) {
+			implemtors.put(implementor.getName(),implementor); 
+		}
+		
+		
+		
+		
+		
 	}
 	
 	public void change(){

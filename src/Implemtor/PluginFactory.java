@@ -11,6 +11,7 @@ package Implemtor;
  */
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class PluginFactory {
      * @return      array list of stragy from the plugin
      * @throws      Exception
      */
-   public   ArrayList<Implementor>    getClass (String dicPath) throws  Exception {
+   public   ArrayList<Implementor>    getClassArr(String dicPath) throws  Exception {
 
        File dic=new File(dicPath);
        if(!dic.isDirectory()){
@@ -44,9 +45,16 @@ public class PluginFactory {
                  str= str.substring(0,str.indexOf(".jar"));
                  urls=new URL[1];
                  urls[0]=files[i].toURL();
-                 classLoader= new URLClassLoader(urls);
-                 Class aClass = classLoader.loadClass("plugIn."+str);
-                 arr.add((Implementor) aClass.newInstance());
+                 classLoader= new URLClassLoader(urls);                
+                 Class aClass = classLoader.loadClass("Implemtor."+str);
+                 Class[] types=new Class[1]; 
+                 types[0]=String.class; 
+                 
+                 Constructor constructor=aClass.getConstructor(types);
+                 
+                 //TODO add the relevant string here 
+                
+                 arr.add((Implementor) constructor.newInstance("relvant String"));
            }
        }
        return arr;
