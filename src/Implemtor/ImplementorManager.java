@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import message.ACK;
 import message.Message;
 
 public class ImplementorManager {
@@ -34,12 +35,57 @@ public class ImplementorManager {
 	}
 	
 	public void change(){
+		synchronized (inst) {
+			
+		}
 		
 	}
 	
-	public Message commitTask(Message ms){
-		//TODO 
+	public ACK commitTask(Message msg){
+		synchronized (inst) {
+			Implementor imp=getImplemntor(msg); 
+			if (imp==null)	noSouchImp(); 
+			if(msg.equals("genrate key Pair"))			genrateKeyPair(imp); 
+			if(msg.equals("install cert")) 				installCert(imp); 
+			if(msg.equals("genrate secret"))			genrateSecret(imp);
+			if(msg.equals("install secret"))			installSeceret(imp); 
+			
+			
+			
+			
+			
+		} 
 		return null; 
+	}
+
+	private void installSeceret(Implementor imp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void genrateSecret(Implementor imp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void installCert(Implementor imp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void genrateKeyPair(Implementor imp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void noSouchImp() {
+		// TODO what happend when we haven't implemntor with this name 
+		
+	}
+
+	private Implementor getImplemntor(Message msg) {
+	
+			return  implemtors.get(msg);
 	}
 	
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import Implemtor.ImplementorManager;
 import Implemtor.ListenPluginDir;
 
+import message.ACK;
 import message.Message;
 
 public class Manager {
@@ -25,9 +26,9 @@ public class Manager {
 			String updates=net.getNewTasks(); 
 			ArrayList<Message> messages=parser.parseMessage(updates);
 			for(Message msg:messages){
-				Message retMsg=impManager.commitTask(msg);
-				String jsonMsg=parser.buildMessage(retMsg); 
-				net.sendResponse(jsonMsg); 
+				ACK retMsg=impManager.commitTask(msg);
+				//String jsonMsg=parser.buildMessage(retMsg); 
+				net.sendResponse(retMsg); 
 			}		
 			
 			

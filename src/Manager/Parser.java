@@ -23,8 +23,7 @@ public class Parser {
 			tail=tail.substring(nextTokenIndex+1);
 			Message temp =parseOneMessage(head); 
 		
-		}
-	    
+		} 
 		
 		
 		return null; 
