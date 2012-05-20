@@ -3,6 +3,7 @@ package Manager;
 import java.util.ArrayList;
 
 import Implemtor.ImplementorManager;
+import Implemtor.ListenPluginDir;
 
 import message.Message;
 
@@ -15,6 +16,9 @@ public class Manager {
 		
 		Communicate net=new Communicate(); 
 		Parser parser=new Parser(); 
+		String str="[{\"taskId\":\"1\",\"dependOn\":\"0\",\"kind\":\"GenerateKey\",\"implementorId\":\"Tomcat\",\"commandDate\":\"2012-05-19 22:06:44\"}!{\"taskId\":\"2\",\"dependOn\":\"0\",\"kind\":\"GenerateKey\",\"implementorId\":\"Tomcat\",\"commandDate\":\"2012-05-19 22:06:44\"}]";
+		parser.parseMessage(str); 
+		
 		ImplementorManager impManager=ImplementorManager.getInstance(); 
 		
 		while(true){

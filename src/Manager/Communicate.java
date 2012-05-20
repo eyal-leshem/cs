@@ -3,7 +3,7 @@ package Manager;
 public class Communicate{
 	//walla walla
 	public String getNewTasks(){
-		// ToDo 
+		// TODO write the class for get new tasks  
 		return null; 
 	}
 	
