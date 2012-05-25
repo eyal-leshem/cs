@@ -1,5 +1,7 @@
 package Manager;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.util.ArrayList;
 
 import Implemtor.ImplementorManager;
@@ -7,29 +9,28 @@ import Implemtor.ListenPluginDir;
 
 import message.ACK;
 import message.Message;
-
+import java.util.Date;
 public class Manager {
 
+	static final String agentName=getNameAgent();
 	
 	public static void main(String[] args) throws Exception {
-		
-		
-		
+		//TODO get agnet name from conf file 
+		String agentName="yosi";
 		Communicate net=new Communicate(); 
-		Parser parser=new Parser(); 
-		String str="[{\"taskId\":\"1\",\"dependOn\":\"0\",\"kind\":\"GenerateKey\",\"implementorId\":\"Tomcat\",\"commandDate\":\"2012-05-19 22:06:44\"}!{\"taskId\":\"2\",\"dependOn\":\"0\",\"kind\":\"GenerateKey\",\"implementorId\":\"Tomcat\",\"commandDate\":\"2012-05-19 22:06:44\"}]";
-		parser.parseMessage(str); 
-		
+		Parser parser=new Parser(); 		
 		ImplementorManager impManager=ImplementorManager.getInstance(); 
-		
+		impManager.setAgentName(agentName); 
+	
 		while(true){
-			String updates=net.getNewTasks(); 
-			ArrayList<Message> messages=parser.parseMessage(updates);
-			for(Message msg:messages){
-				ACK retMsg=impManager.commitTask(msg);
-				//String jsonMsg=parser.buildMessage(retMsg); 
-				net.sendResponse(retMsg); 
-			}		
+			String updates=net.getNewTasks();
+			if(updates!=null){
+				ArrayList<Message> messages=parser.parseMessage(updates);
+				for(Message msg:messages){
+					ACK retMsg=impManager.commitTask(msg);
+					net.sendResponse(retMsg,agentName); 
+				}	
+			}
 			
 			
 			try {
@@ -39,8 +40,13 @@ public class Manager {
 			} 
 		}
 	}
+
+	private static String getNameAgent() {
+		// TODO Auto-generated method stub
+		return "agent1" ;
+	}
 	
-	
+
 	
 
 }

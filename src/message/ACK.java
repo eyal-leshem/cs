@@ -4,9 +4,32 @@ public class ACK {
 	
 	boolean	OK=true; 
 	String	data;
+	String  dataAlg;
+	String  dataKind;
 	String	taskId; 
 	String	implemntorName;
-	public boolean isOK() {
+	String  errorMsg; 
+	
+	public String getDataAlg() {
+		return dataAlg;
+	}
+	public String getDataKind() {
+		return dataKind;
+	}
+	public void setDataKind(String dataKind) {
+		this.dataKind = dataKind;
+	}
+	public void setDataAlg(String dataAlg) {
+		this.dataAlg = dataAlg;
+	}
+	public String getErrorMsg() {
+		return errorMsg;
+	}
+	public void setErrorMsg(String errorMsg) {
+		this.errorMsg = errorMsg;
+	}
+
+	public boolean isOK(){
 		return OK;
 	}
 	public void setOK(boolean oK) {

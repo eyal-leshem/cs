@@ -1,21 +1,43 @@
 package Implemtor;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream.GetField;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import Commands.Command;
+import Commands.CommandFactory;
+
+import com.sun.xml.internal.ws.message.ByteArrayAttachment;
+
+import sun.misc.BASE64Encoder;
 
 import message.ACK;
 import message.Message;
 
 public class ImplementorManager {
 	
+	CommandFactory commandFactory=CommandFactory.getInstance(); 
+	
+	private String agentName=null; 
+	
 	Map<String,Implementor> implemtors=new HashMap<String,Implementor>();
-	static ImplementorManager inst=null; 
+	static ImplementorManager inst=null;
+	
 	
 	public static ImplementorManager getInstance() throws Exception{
 		if(inst==null){
-			return new ImplementorManager(); 
+			inst= new ImplementorManager(); 
 		}
 		return inst;
 		
@@ -41,52 +63,42 @@ public class ImplementorManager {
 		
 	}
 	
-	public ACK commitTask(Message msg){
+	public ACK commitTask(Message msg) throws Exception{
+		
+		ACK ack=null;
 		synchronized (inst) {
-			Implementor imp=getImplemntor(msg); 
-			if (imp==null)	noSouchImp(); 
-			if(msg.equals("genrate key Pair"))			genrateKeyPair(imp); 
-			if(msg.equals("install cert")) 				installCert(imp); 
-			if(msg.equals("genrate secret"))			genrateSecret(imp);
-			if(msg.equals("install secret"))			installSeceret(imp); 
-			
-			
-			
-			
-			
+			Implementor imp=getImplemntor(msg);			
+			try{
+				if (imp==null)	noSouchImp(); 
+				Command command=commandFactory.getCommand(msg.getKind()); 
+				ack=command.excute(imp);
+				
+		 
+			}
+			catch (Exception e) {
+				ack.setOK(false);  
+			}			
+			ack.setTaskId(msg.getID()); 		
 		} 
-		return null; 
+		return ack; 
 	}
 
-	private void installSeceret(Implementor imp) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	private void genrateSecret(Implementor imp) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void installCert(Implementor imp) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void genrateKeyPair(Implementor imp) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void noSouchImp() {
-		// TODO what happend when we haven't implemntor with this name 
+	private void noSouchImp() throws Exception {
+		throw new Exception(); 
 		
 	}
 
 	private Implementor getImplemntor(Message msg) {
 	
-			return  implemtors.get(msg);
+			return  implemtors.get(msg.getImplementorID());
 	}
+	
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+	
+
 	
 
 }

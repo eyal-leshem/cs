@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sun.org.apache.xml.internal.utils.NSInfo;
+
 import message.Message;
 
 public class Parser {
@@ -14,19 +16,25 @@ public class Parser {
 	public ArrayList<Message> parseMessage(String msg) throws Exception{
 		
 		ArrayList<Message> 	msgArr=new ArrayList<Message>(); 
-		int 				nextTokenIndex=msg.indexOf("!"); 
+		int 				nextTokenIndex=msg.indexOf("},{"); 
 		String 				tail=msg; 
 		String 				head;
+		Message 			temp; 
 		
 		while(nextTokenIndex!=-1){
-			head=msg.substring(1,nextTokenIndex); 
-			tail=tail.substring(nextTokenIndex+1);
-			Message temp =parseOneMessage(head); 
+			head=msg.substring(1,nextTokenIndex+1); 
+			tail=tail.substring(nextTokenIndex+2);
+			temp =parseOneMessage(head); 
+			msgArr.add(temp);
+			nextTokenIndex=tail.indexOf("},{");
+		}
+		tail=tail.substring(0,tail.length()-1);
+		temp=parseOneMessage(tail);
+		msgArr.add(temp); 
 		
-		} 
 		
 		
-		return null; 
+		return msgArr; 
 	}
 	
 	private Message parseOneMessage(String head) throws Exception {
@@ -52,7 +60,7 @@ public class Parser {
 		
 		
 		
-		return null;
+		return ret;
 	}
 
 	public String buildMessage(Message msg){
