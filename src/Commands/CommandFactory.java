@@ -1,5 +1,7 @@
 package Commands;
 
+import message.Message;
+
 public class CommandFactory {
 	
  	private static CommandFactory inst=null;
@@ -15,13 +17,14 @@ public class CommandFactory {
  		return inst; 
  	}
  	
- 	public  Command getCommand(String commandName) throws Exception{
-		if(commandName.equals("generate key Pair"))	    return new GenrateKeyPairCommand(); 
-		if(commandName.equals("install cert")) 			return new InstallCertCommand(); 
-		if(commandName.equals("generate secret"))		return new GenrateSecertCommand();
-		if(commandName.equals("install secret"))		return new InstallSecertCommand();
+ 	public  Command getCommand(Message msg) throws Exception{
+		if(msg.getKind().equals("generate key Pair"))	    return new GenrateKeyPairCommand(); 
+		if(msg.getKind().equals("generate secret"))			return new GenrateSecertCommand();
+		if(msg.getKind().equals("install cert"))        	return new InstallCertCommand(); 	
+		if(msg.getKind().equals("install secret"))			return new InstallSecertCommand(); 
 		
-		throw new Exception("no such command "+commandName); 
+		
+		throw new Exception("no such task suiteable to - "+msg.getKind()); 
  	
  	}
 

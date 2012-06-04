@@ -17,6 +17,7 @@ import java.util.Map;
 
 import Commands.Command;
 import Commands.CommandFactory;
+import Manager.AgentServiceConf;
 
 import com.sun.xml.internal.ws.message.ByteArrayAttachment;
 
@@ -27,12 +28,15 @@ import message.Message;
 
 public class ImplementorManager {
 	
-	CommandFactory commandFactory=CommandFactory.getInstance(); 
 	
-	private String agentName=null; 
+	private static 	AgentServiceConf		conf; 
+	static 			ImplementorManager 		inst=null;	
+	private			CommandFactory			commandFactory=CommandFactory.getInstance(); 
+	private static 	PluginManger 			pluginManger; 
+
+
 	
-	Map<String,Implementor> implemtors=new HashMap<String,Implementor>();
-	static ImplementorManager inst=null;
+	
 	
 	
 	public static ImplementorManager getInstance() throws Exception{
@@ -44,41 +48,38 @@ public class ImplementorManager {
 	}
 	
 	private ImplementorManager() throws Exception {
-		PluginFactory pluginFactory=new PluginFactory(); 
-		ArrayList<Implementor>  implemtorArr=pluginFactory.getClassArr("c:\\temp\\agentService\\plugins"); 
-		for (Implementor implementor : implemtorArr) {
-			implemtors.put(implementor.getName(),implementor); 
-		}
 		
-		
-		
-		
-		
-	}
-	
-	public void change(){
-		synchronized (inst) {
-			
+		try {
+			pluginManger=PluginManger.getInstance(); 
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 		
 	}
+		
+
 	
+
 	public ACK commitTask(Message msg) throws Exception{
 		
 		ACK ack=null;
+		
 		synchronized (inst) {
 			Implementor imp=getImplemntor(msg);			
 			try{
 				if (imp==null)	noSouchImp(); 
-				Command command=commandFactory.getCommand(msg.getKind()); 
-				ack=command.excute(imp);
-				
-		 
+				Command command=commandFactory.getCommand(msg); 
+				ack=command.excute(imp,msg);
+				ack.setOK(true); 
 			}
 			catch (Exception e) {
-				ack.setOK(false);  
-			}			
-			ack.setTaskId(msg.getID()); 		
+				ack.setOK(false);
+				ack.setErrorMsg(e.getMessage());
+			}
+			finally{
+				ack.setTaskId(msg.getID()); 
+				ack.setImplemntorName(imp.getName()); 
+			}
 		} 
 		return ack; 
 	}
@@ -89,15 +90,18 @@ public class ImplementorManager {
 		
 	}
 
-	private Implementor getImplemntor(Message msg) {
-	
-			return  implemtors.get(msg.getImplementorID());
+	private Implementor getImplemntor(Message msg) {	
+		 return 	pluginManger.getImplementor(msg); 
 	}
 	
-	public void setAgentName(String agentName) {
-		this.agentName = agentName;
+
+	public static AgentServiceConf getConf() {
+		return conf;
 	}
-	
+
+	public static void setConf(AgentServiceConf conf) {
+		ImplementorManager.conf = conf;
+	}
 
 	
 

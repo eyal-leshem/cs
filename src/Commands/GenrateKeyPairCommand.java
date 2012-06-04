@@ -5,6 +5,7 @@ import java.security.cert.CertificateEncodingException;
 
 import sun.misc.BASE64Encoder;
 import message.ACK;
+import message.Message;
 import Implemtor.Implementor;
 
 public class GenrateKeyPairCommand implements Command {
@@ -13,7 +14,7 @@ public class GenrateKeyPairCommand implements Command {
 	final String endCertString="\r\n-----END CERTIFICATE-----\r\n"; 
 
 	@Override
-	public ACK excute(Implementor imp) throws Exception{
+	public ACK excute(Implementor imp,Message msg) throws Exception{
 		Certificate cert=imp.genrateKeyPair("cn=a,ou=a,o=a,l=a,s=a,c=a");
 		BASE64Encoder base64Encoder=new BASE64Encoder();
 		
@@ -27,11 +28,10 @@ public class GenrateKeyPairCommand implements Command {
 		
 		String crtBody=base64Encoder.encode(certBytes); 
 		String crtFinal=beginCertString+crtBody+endCertString; 		
+		
 		ACK ret=new ACK();				
 		ret.setData(crtFinal); 
-		ret.setImplemntorName(imp.getName());
-		ret.setOK(true); 
-		ret.setDataAlg("X.509");
+		ret.setDataAlg(msg.getAlg());
 		ret.setDataKind("certificate"); 
 		
 		return ret; 

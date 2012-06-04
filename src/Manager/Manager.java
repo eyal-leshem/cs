@@ -1,50 +1,79 @@
 package Manager;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
+
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-
 import Implemtor.ImplementorManager;
-import Implemtor.ListenPluginDir;
-
 import message.ACK;
 import message.Message;
-import java.util.Date;
+
 public class Manager {
 
-	static final String agentName=getNameAgent();
+	static AgentServiceConf conf; 
 	
 	public static void main(String[] args) throws Exception {
-		//TODO get agnet name from conf file 
-		String agentName="yosi";
+		getConf(); 
+		
 		Communicate net=new Communicate(); 
-		Parser parser=new Parser(); 		
+		Parser parser=new Parser(); 	
+		ImplementorManager.setConf(conf); 
 		ImplementorManager impManager=ImplementorManager.getInstance(); 
-		impManager.setAgentName(agentName); 
+		
 	
 		while(true){
-			String updates=net.getNewTasks();
+			String updates=net.getNewTasks(conf);
 			if(updates!=null){
 				ArrayList<Message> messages=parser.parseMessage(updates);
+				
 				for(Message msg:messages){
 					ACK retMsg=impManager.commitTask(msg);
-					net.sendResponse(retMsg,agentName); 
+					net.sendResponse(retMsg,conf); 
 				}	
 			}
 			
 			
 			try {
-				Thread.sleep(30000);
+				Thread.sleep(conf.getSleepTime()*1000);
 			} catch (InterruptedException e) {
 								
 			} 
 		}
 	}
 
-	private static String getNameAgent() {
-		// TODO Auto-generated method stub
-		return "agent1" ;
+	private static void getConf() throws Exception  {
+		//read the json string that contain the properties from the file 
+		File confFile=new File("conf.cnf"); 
+		FileReader fr;
+		
+		try {
+			fr = new FileReader(confFile);
+		} catch (FileNotFoundException e) {
+			throw new Exception("cound not file the configuration file - conf.cnf",e); 
+		}
+		
+		char[] buffer=new  char[(int)confFile.length()];
+		
+		try {
+			fr.read(buffer);
+		} catch (IOException e) {
+			throw new Exception("problem to read from the configuration file",e); 
+		}
+		finally{
+			fr.close(); 
+		}
+		
+		String jsonConfStr=new String(buffer); 
+		
+		//and use the json conf contractor 
+	   conf= new AgentServiceConf(jsonConfStr); 
+		
 	}
+
+
 	
 
 	

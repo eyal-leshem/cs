@@ -17,7 +17,17 @@ public class Message
  
 	String msgData;   //string with data (public key...)
  
-	String kind;    
+	String kind;  
+	
+	String alg; 
+
+	public String getAlg() {
+		return alg;
+	}
+
+	public void setAlg(String alg) {
+		this.alg = alg;
+	}
 
 	public String getID() {
 		return ID;
