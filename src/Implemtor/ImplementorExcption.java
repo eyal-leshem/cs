@@ -2,6 +2,13 @@ package Implemtor;
 
 public class ImplementorExcption extends Exception {
 	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7648034789960810239L;
+
+
 	public ImplementorExcption(String msg) {
 		super(msg); 
 	}

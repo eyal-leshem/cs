@@ -2,6 +2,7 @@ package Manager;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -17,6 +18,7 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
@@ -28,6 +30,8 @@ import org.apache.http.protocol.HTTP;
 
 import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
+import exceptions.AgentServiceException;
+
 import message.ACK;
 
 public class Communicate{
@@ -37,28 +41,35 @@ public class Communicate{
 	
 
 
-	
-	public String getNewTasks(AgentServiceConf conf) throws Exception{
+	/**
+	 * ans the server for new task 
+	 * 
+	 * @param conf
+	 * @return string that contain an json task description
+	 * @throws AgentServiceException
+	 */
+	public String getNewTasks(AgentServiceConf conf) throws AgentServiceException{
 		//open https socket 
 		DefaultHttpClient httpclient = new DefaultHttpClient();
-		Scheme sch=getScheme(); 
-        httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+		Scheme sch=getScheme();
+		httpclient.getConnectionManager().getSchemeRegistry().register(sch);
         
     	List <NameValuePair> nvps=new ArrayList<NameValuePair>(); 
   	  	nvps.add(new BasicNameValuePair("agentName",conf.getAgentName()));
   	  	 
         
-        //excute the method 
+        //create the post request 
         HttpPost postRequest = new HttpPost(conf.getUrlGetTask());
-        postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8)); 
-        HttpResponse response=httpclient.execute(postRequest);
-        HttpEntity  entity= response.getEntity(); 
         
-        //make string from the http response
-        InputStream in=entity.getContent(); 
-        byte[] ans=new byte[(int)entity.getContentLength()];
-        in.read(ans); 
-        String resStr=new String(ans); 
+        //set hte entity in post request 
+        try {
+			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+		} catch (UnsupportedEncodingException e) {
+			throw new AgentServiceException("problem with post reqwest"); 
+		} 
+        
+ 
+        String resStr=excutePost(postRequest,httpclient);
        
         //get the task form the result 
         int beginJson=resStr.indexOf(pattern)+pattern.length();
@@ -68,19 +79,70 @@ public class Communicate{
         return jsonStr; 
 	}
 	
+	/**
+	 * exucte post method 
+	 * @param postRequest
+	 * @param httpclient
+	 * @return
+	 * @throws AgentServiceException
+	 */
+	private String excutePost(HttpPost postRequest, DefaultHttpClient httpclient) throws AgentServiceException {
+        //excute the methos 
+        HttpResponse response;
+		try {
+			response = httpclient.execute(postRequest);
+		} catch (Exception e){
+			throw new AgentServiceException("problem while excuting post method", e);  
+		}
+        HttpEntity  entity= response.getEntity(); 
+        
+        //get the data from the response into inputstraem 
+        InputStream in;
+		try {
+			in = entity.getContent();
+		} catch (Exception e){
+			throw new AgentServiceException("problem to get the data from the response", e);
+		}
+		
+	     
+		//read the answer into a byte array and make string from it 
+		byte[] ans=new byte[(int)entity.getContentLength()];
+	    try {
+			in.read(ans);
+		} catch (IOException e) {
+			throw new AgentServiceException("can't read the nsg from the input stream of the response"); 
+		} 
+	    
+        return  new String(ans);
+	}
+
 	/*
 	 * load an keystore object 
 	 */
-	private KeyStore loadKeyStore(String path) throws Exception {
+	private KeyStore loadKeyStore(String path) throws AgentServiceException {
 	    
-		KeyStore keyStroe  = KeyStore.getInstance(KeyStore.getDefaultType());
-        FileInputStream instream = new FileInputStream(new File(path));
+		//get the keystore class 
+		KeyStore keyStroe;
+		try {
+			keyStroe = KeyStore.getInstance(KeyStore.getDefaultType());
+		} catch (KeyStoreException e) {
+			throw new AgentServiceException("can't get istance of keystore class" ,e); 
+		}
+		
+		//get the inputsteam fron the oath 
+        FileInputStream instream;
+		try {
+			instream = new FileInputStream(new File(path));
+		} catch (FileNotFoundException e) {
+			throw new AgentServiceException("can't generate keystore file from :"+path, e);
+		}
         
+		//load the keysotre 
         try {													  
             try {
 				keyStroe.load(instream, "a10097".toCharArray());
 			} catch (Exception e){
-				throw new Exception("problem to load the key store",e);
+				throw new AgentServiceException("problem to load the key store",e);
 			}
         } finally {
             try { instream.close(); } catch (Exception ignore) {}
@@ -90,7 +152,8 @@ public class Communicate{
         
 	}
 
-	public void sendResponse(ACK retMsg,AgentServiceConf conf) throws Exception{
+	public void sendResponse(ACK retMsg,AgentServiceConf conf) throws AgentServiceException{
+		
 		//create http connection with the keystore
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		Scheme sch=getScheme(); 
@@ -98,19 +161,16 @@ public class Communicate{
 		
         //create post request with body  
         HttpPost postRequest = new HttpPost(conf.getUrlSendAck());               
-    	List <NameValuePair> nvps = makeMsgBody(retMsg,conf.getAgentName()); 
-    	postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+    	List <NameValuePair> nvps = makeMsgBody(retMsg,conf.getAgentName());
     	
-    	//execute method 
-    	HttpResponse response=httpclient.execute(postRequest);
-        HttpEntity  entity= response.getEntity(); 
-           
-        //make string from the http response
-        InputStream in=entity.getContent(); 
-        byte[] ans=new byte[(int)entity.getContentLength()];
-        in.read(ans); 
-        String resStr=new String(ans);       
-        
+    	
+    	try {
+			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+		} catch (UnsupportedEncodingException e) {
+			throw new AgentServiceException("post the message body in the post reqwest",e);
+		}
+    	
+    	String resString=excutePost(postRequest, httpclient);
 		
 	}
 	
@@ -147,19 +207,29 @@ public class Communicate{
 
 	}
 	
-	private Scheme getScheme() throws Exception{
-		//TODO genrate ke
+	private Scheme getScheme() throws AgentServiceException{
+		
+		
 		String here=new File(".").getAbsolutePath();
 		String selesh= System.getProperty("file.separator"); 
-		String ksPath=here+selesh+"keystore"+selesh+"my.ks"; 
+		
+		//path of keystore and truststore 
+		String ksPath=here+selesh+"keystore"+selesh+"my.ks";
+		String truststorePath=here+selesh+"keystore"+selesh+"my.ts"; 
 	
+	    //load the keystore and truststore 	 
+		KeyStore keystore = loadKeyStore(ksPath);		
+		KeyStore truststore=loadKeyStore(truststorePath); 
 		
-		KeyStore keystore= loadKeyStore(ksPath); 
-		KeyStore truststore=loadKeyStore(ksPath); 
+		//generate ssl socket 
+		SSLSocketFactory socketFactory;
+		try {
+			socketFactory = new SSLSocketFactory(keystore,"a10097",truststore);
+		} catch (Exception e){
+			throw new AgentServiceException("can't generate ssl-socket",e); 
+		}
 		
-		SSLSocketFactory socketFactory = new SSLSocketFactory(keystore,"a10097",truststore);
-		
-		 
+		 //return the new scheme 
         Scheme sch = new Scheme("https", 443, socketFactory);
 		return sch;
 	}

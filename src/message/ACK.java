@@ -2,14 +2,26 @@ package message;
 
 public class ACK {
 	
-	boolean	OK=true; 
+	//commons 
+	boolean	OK=true;
+	String	taskId; 
+	String	implemntorName;
+	
+	//ack with data
 	String	data;
 	String  dataAlg;
 	String  dataKind;
-	String	taskId; 
-	String	implemntorName;
+
+	//error ack 
 	String  errorMsg; 
+	String  fullExceptionString; 
 	
+	public String getFullExceptionString() {
+		return fullExceptionString;
+	}
+	public void setFullExceptionString(String fullExceptionString) {
+		this.fullExceptionString = fullExceptionString;
+	}
 	public String getDataAlg() {
 		return dataAlg;
 	}

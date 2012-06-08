@@ -4,12 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+
+import exceptions.AgentServiceException;
 
 import message.Message;
 
-import Commands.CommandFactory;
-
-public class PluginManger {
+public class PluginManger implements Observer {
 	
 	PluginFactory 						pluginFactory;
 	ListenPluginDir 					watcher;//listener for the changes in folder
@@ -17,23 +19,28 @@ public class PluginManger {
 	static PluginManger 				inst=null;
 	
 	
-	public PluginManger() {
+	public PluginManger() throws AgentServiceException {
+		
+	
 		String pluginDirPath=new File(".").getAbsolutePath()+System.getProperty("file.separator")+"plugins"; 
 		
 		PluginFactory pluginFactory=new PluginFactory(); 
 		ArrayList<Implementor> implemtorArr;
 		
+		
+		//load the implemtor array 
 		try {
 			implemtorArr = pluginFactory.getClassArr(pluginDirPath);
+		} catch (AgentServiceException e) {
+			throw new AgentServiceException("can't load the arraylist of plugins", e);
+		}
 			
-			for (Implementor implementor : implemtorArr) {
-					implemtors.put(implementor.getName(),implementor); 
-			}	
+			//put it on hashmap 
+		for (Implementor implementor : implemtorArr) {
+				implemtors.put(implementor.getName(),implementor); 
+		}	
 			
-		} catch (Exception e) {
-			// can't load load plugins from the dir 
-			e.printStackTrace();
-		} 
+		 
 		
 		
 	}
@@ -138,6 +145,9 @@ public class PluginManger {
 		}
 		
 	}
+
+
+
 	
 	
 

@@ -2,6 +2,8 @@ package Implemtor;
 
 
 import java.util.Observable;
+
+import exceptions.AgentServiceException;
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
@@ -113,8 +115,9 @@ public class ListenPluginDir extends Observable implements Runnable
 
 
 		try {
-			int watchID = JNotify.addWatch(folderPath, mask, true, new Listener());
+			JNotify.addWatch(folderPath, mask, true, new Listener());
 		} catch (JNotifyException e) {
+			//TODO write to log the problem  
 		}
 	    while(stop == false) 
 	    {

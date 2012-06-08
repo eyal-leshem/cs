@@ -12,9 +12,10 @@ package Implemtor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.MalformedURLException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.InvalidKeyException;
@@ -24,9 +25,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -35,6 +35,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.SecretKeySpec;
+
+import exceptions.AgentServiceException;
 
 
 
@@ -53,39 +55,53 @@ public class PluginFactory
 	
 	
     /**
-     * this method get a path of dircetory ad return array list of
-     * classes for the stategy
+     * this method get a path of a plugin directory ad return array list of
+     * implementor that loaded plugin that in that dir 
      *
-     * @param       dicPath   - the path of diconery of plugIn
-     * @return      array list of stragy from the plugin
+     * @param       dicPath   - the path of directory of plugIn
+     * @return      array list of implementors
      * @throws      Exception
      */
-   public   ArrayList<Implementor> getClassArr(String dicPath) throws  Exception 
+   public   ArrayList<Implementor> getClassArr(String dicPath) throws  AgentServiceException
    {
 
        File dic = new File(dicPath);
        
        if(!dic.isDirectory())
        {
-           throw new Exception(" not good path ");
+           throw new AgentServiceException(" not good path - no such dir :"+dicPath);
        }
        
-       ////??????????????////
-       propString = getPropStr();
-       files = dic.listFiles();
-       urls = new URL[files.length];
-       classLoader = this.getClass().getClassLoader();
+       //all the properties are encrypted  in file 
+       //here we decrypte that file
+       try{
+    	   propString = getPropStr();
+       }
+       catch (AgentServiceException e) {
+    	   throw new AgentServiceException("can't read propeties string from file",e); 
+       }
+       
+       //get the file list 
+	   files = dic.listFiles();
 
+	   //create new empty arraylist of imlemntors 
        ArrayList<Implementor> arr = new ArrayList<Implementor>();
        
+       //run over all the file in this dir 
        for(int i=0; i < files.length; i++)
        {
+    	   //get the name of file 
            String str = files[i].getName();
-           
+           //only jar files can contain a plugin 
            if(str.endsWith(".jar"))
-           {               
-                 //get the constructor of the jar and insert into array of c-tors
-                 arr.add((Implementor) getConstructor(str, files[i].toURL()));
+           {      
+        	   try{
+        		   //get the constructor of the jar and insert into array of c-tors
+        		   arr.add((Implementor) getImplementorClass(str, files[i].toURL()));
+        	   }
+        	   catch (Exception e) {
+				  //TODO say to logger that can't add this class 
+			}
            }
        }
        
@@ -93,19 +109,31 @@ public class PluginFactory
 
    }
    
-   
+   /*
+    * get the json string that contain the relevant properties to the "name"
+    */
 	private String getRelevantProprties(String propString ,String name) 
 	{
-		
+		//any block of properties will statrt by "----"
+		//than will con the name 
+		//then "\n" 
+		//than the properties json string 
+		//examle "----yosi\n{"prop1":"1","prop2":"2"}
 		int satrtIndex=propString.indexOf("----"); 
 		
+		//run over all the properties block 
 		while(satrtIndex!=-1){
+			
+			//get the satrt of this properties block 
 			propString=propString.substring(satrtIndex+4); 
 			String propName= propString.substring(0,propString.indexOf("\n")); 
+			
+			//bingo 
 			if(propName.equals(name)){
 				propString=propString.substring(propString.indexOf("\n")+1,propString.indexOf("\n", propString.indexOf("\n")+1)); 
 				return propString; 
 			}
+			//next propeties block 
 			satrtIndex=propString.indexOf("----"); 
 		}
 		
@@ -113,30 +141,70 @@ public class PluginFactory
 	}
 
 
-	private String getPropStr() 
-			throws KeyStoreException, KeyManagementException, UnrecoverableKeyException, 
-			NoSuchAlgorithmException, IOException, NoSuchProviderException, InvalidKeySpecException, 
-			IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchPaddingException {
+	private String getPropStr() 	throws AgentServiceException {
 		
 		File keyFile = new File("c:\\temp\\agentService\\plugins\\CA.ico"); 
 		byte[] keyBytes = new byte[(int)keyFile.length()]; 
-		FileInputStream in = new FileInputStream(keyFile); 
-		in.read(keyBytes); 
-		in.close(); 
 		
-		SecretKeyFactory skf = SecretKeyFactory.getInstance("DES","BC"); 
-		SecretKeySpec keySpec = new SecretKeySpec(keyBytes,"DES"); 
-		SecretKey sk=skf.generateSecret(keySpec);
+		FileInputStream in;
+		try {
+			in = new FileInputStream(keyFile);
+		} catch (FileNotFoundException e) {
+			throw new AgentServiceException("can't genrate input steam from key file", e); 			
+		} 
 		
-		Cipher c = Cipher.getInstance("DES");
-		c.init(Cipher.DECRYPT_MODE, sk);
+		try {
+			in.read(keyBytes);
+		} catch (IOException e) {
+			throw new AgentServiceException("read the bytes from keyfile ", e); 	
+		} 
+		
+		try {
+			in.close();
+		} catch (IOException e) {} 
+		
+		SecretKeySpec keySpec;
+		try{
+			keySpec = new SecretKeySpec(keyBytes,"DES"); 
+		}catch (Exception e) {
+			throw new AgentServiceException("can't genrate create the secert key spec ", e); 	
+		}
+		
+		
+		Cipher c;
+		try {
+			c = Cipher.getInstance("DES");
+		} catch (Exception e){
+			throw new AgentServiceException("can't get istance of cipher ", e); 	
+		}
+		
+		
+		try {
+			c.init(Cipher.DECRYPT_MODE, keySpec);
+		} catch (InvalidKeyException e) {
+			throw new AgentServiceException("can't init the chiper ", e); 
+		}
 		 
+		//the file of the that contain the properties 
 		File file = new File("c:\\temp\\agentService\\prop"); 
 		byte[] arr = new byte[(int)file.length()];
-		FileInputStream fr = new FileInputStream(file); 
-		fr.read(arr); 
+		
+		
+		try{
+			FileInputStream fr = new FileInputStream(file); 
+			fr.read(arr); 
+		}
+		catch (IOException e) {
+			throw new AgentServiceException("can't get content of the prop string", e); 
+		}
 		 
-		byte[] encData = c.doFinal(arr);
+		byte[] encData;
+		try {
+			encData = c.doFinal(arr);
+		} catch (Exception e){
+			throw new AgentServiceException("can't decrypt the propeties file ", e); 
+		}
+		
 		String ans = new String(encData); 
 		return ans;
 		    
@@ -150,9 +218,10 @@ public class PluginFactory
 	 * @param str - string with url
 	 * @param i
 	 * @return
+	 * @throws AgentServiceException 
 	 * @throws Exception
 	 */
-	public Object getConstructor(String str, URL url) throws Exception
+	public Object getImplementorClass(String str, URL url) throws AgentServiceException 
 	{
 		//get the name of jar
 		str = str.substring(0, str.indexOf(".jar"));
@@ -161,13 +230,33 @@ public class PluginFactory
         String props = getRelevantProprties(propString, str); 
         urls = new URL[1];
         urls[0] = url;
-        classLoader = new URLClassLoader(urls);                
-        Class aClass = classLoader.loadClass("Implemtor."+str);
+        classLoader = new URLClassLoader(urls); 
+        
+        //get the class object
+        Class aClass;
+		try {
+			aClass = classLoader.loadClass("Implemtor."+str);
+		} catch (ClassNotFoundException e) {
+			throw new AgentServiceException("cnn't load the class Implemtor."+str,e); 
+		}
+        
         Class[] types = new Class[1]; 
         types[0] = String.class; 
         
-        Constructor constructor = aClass.getConstructor(types);
-        return constructor.newInstance(props);
+        Constructor constructor;
+        
+        //get the constracrtor 
+		try {
+			constructor = aClass.getConstructor(types);
+		} catch (Exception e){
+			throw new AgentServiceException("problem get the class c-tor",e); 
+		}
+		
+        try {
+			return constructor.newInstance(props);
+		} catch (Exception e){
+			throw new AgentServiceException("problem to get new intance of the class",e); 
+		}
 	}
 	
 	
@@ -189,7 +278,7 @@ public class PluginFactory
            //throw new CMnotFound(" The file in the path " + dicPath " is not a correct jar ", null);
 		}
 		//if it is a correct jar - return the constructor of the class
-		return (Implementor) getConstructor(path, fileObj.toURL());
+		return (Implementor) getImplementorClass(path, fileObj.toURL());
 		
 	}
 	

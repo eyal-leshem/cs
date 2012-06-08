@@ -2,6 +2,8 @@ package Manager;
 
 import org.json.*;
 
+import exceptions.AgentServiceException;
+
 public class AgentServiceConf {
 	
 	private 	String agentName; 	
@@ -11,7 +13,7 @@ public class AgentServiceConf {
 	private		int	   sleepTime; 
 	
 	
-	public AgentServiceConf(String jsonConfStr) throws Exception  {
+	public AgentServiceConf(String jsonConfStr) throws AgentServiceException  {
 		JSONObject json;
 	
 		try{
@@ -24,7 +26,7 @@ public class AgentServiceConf {
 			sleepTime=json.getInt("sleepTime");
 			
 		}catch (JSONException e) {
-			throw new Exception("can't parse legal json from the string :\n "+jsonConfStr,e); 
+			throw new AgentServiceException("can't parse legal json from the string :\n "+jsonConfStr,e); 
 		}
 		
 		
