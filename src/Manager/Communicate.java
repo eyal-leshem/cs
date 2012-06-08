@@ -152,6 +152,12 @@ public class Communicate{
         
 	}
 
+	/**
+	 * send ack message to the server 
+	 * @param retMsg - the messge to rerun 
+	 * @param conf - configuration of an agent service 
+	 * @throws AgentServiceException
+	 */
 	public void sendResponse(ACK retMsg,AgentServiceConf conf) throws AgentServiceException{
 		
 		//create http connection with the keystore

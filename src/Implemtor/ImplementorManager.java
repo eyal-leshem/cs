@@ -8,6 +8,7 @@ import Commands.Command;
 import Commands.CommandFactory;
 import Manager.AgentServiceConf;
 import exceptions.AgentServiceException;
+import exceptions.ExceptionHelper;
 
 public class ImplementorManager {
 	
@@ -27,7 +28,7 @@ public class ImplementorManager {
 	 * @return an instance of this implementor manger 
 	 * @throws Exception
 	 */
-	public static ImplementorManager getInstance() throws Exception{
+	public static ImplementorManager getInstance() throws AgentServiceException{
 		if(inst==null){
 			inst= new ImplementorManager(); 
 		}
@@ -76,7 +77,7 @@ public class ImplementorManager {
 			catch (AgentServiceException e) {
 				ack.setOK(false);
 				ack.setErrorMsg(e.getMessage());
-				ack.setFullExceptionString(getCustomStackTrace(e)); 
+				ack.setFullExceptionString(ExceptionHelper.getCustomStackTrace(e)); 
 			}
 			
 			//the relevant properties for each ack 
@@ -88,24 +89,7 @@ public class ImplementorManager {
 		return ack; 
 	}
 	
-	  /**
-	  * Defines a custom format for the stack trace as String.
-	  */
-	  public static String getCustomStackTrace(Throwable aThrowable) {
-	    
-		 //add the class name and any message passed to constructor
-	    StringBuilder result = new StringBuilder( "full stack trace: " );
-	    result.append(aThrowable.toString());
-	    String NEW_LINE = System.getProperty("line.separator");
-	    result.append(NEW_LINE);
 
-	    //add each element of the stack trace
-	    for (StackTraceElement element : aThrowable.getStackTrace() ){
-	      result.append( element );
-	      result.append( NEW_LINE );
-	    }
-	    return result.toString();
-	  }
 
 	
 	private void noSouchImp(String impName) throws AgentServiceException {
