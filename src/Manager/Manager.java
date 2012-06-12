@@ -8,9 +8,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import exceptions.AgentServiceException;
 import exceptions.ExceptionHelper;
 import Implemtor.ImplementorManager;
+import Logger.AgentServiceLogger;
 import message.ACK;
 import message.Message;
 
@@ -30,6 +33,8 @@ public class Manager {
 	public static void main(String[] args)  {
 		
 		Communicate net=new Communicate();
+		AgentServiceLogger logger=AgentServiceLogger.getInstance();
+		logger.init();		
 		
 		//get the configuration  of the agent service 
 		try {
@@ -47,7 +52,7 @@ public class Manager {
 				//get and updates from the net 
 				String updates=net.getNewTasks(conf);
 				
-				if(updates!=null){
+				if(updates!=null&&!updates.equals("null")){
 					ArrayList<Message> messages = null;
 				    
 					//parse the string message that get from the server 

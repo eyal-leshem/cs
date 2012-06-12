@@ -108,7 +108,6 @@ public class Parser {
 				ret.setMsgData(data,true); 
 				 
 			}
-			ret.setMsgData((String)json.getString("data")); 
 		}catch (Exception e) {
 			throw new AgentServiceException("problem to get the data from json string",e);
 		}

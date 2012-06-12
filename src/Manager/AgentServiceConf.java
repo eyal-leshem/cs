@@ -9,6 +9,7 @@ public class AgentServiceConf {
 	private 	String agentName; 	
 	private		String urlSendAck;
 	private		String urlGetTask; 
+	private		String urlNewImplemtor; 
 
 	private		int	   sleepTime; 
 	
@@ -22,6 +23,7 @@ public class AgentServiceConf {
 			agentName= json.getString("agentName");
 			urlSendAck=json.getString("urlSendAck"); 
 			urlGetTask=json.getString("urlGetTask"); 
+			urlNewImplemtor=json.getString("urlNewImplemtor"); 
 		
 			sleepTime=json.getInt("sleepTime");
 			

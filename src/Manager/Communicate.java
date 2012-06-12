@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -27,6 +28,9 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.apache.log4j.Logger;
+
+import Logger.AgentServiceLogger;
 
 import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
@@ -39,7 +43,7 @@ public class Communicate{
 	
 	private final String pattern="*****";
 	
-
+	static AgentServiceLogger logger= AgentServiceLogger.getInstance(); 
 
 	/**
 	 * ans the server for new task 
@@ -49,6 +53,9 @@ public class Communicate{
 	 * @throws AgentServiceException
 	 */
 	public String getNewTasks(AgentServiceConf conf) throws AgentServiceException{
+		
+		logger.info("comunicate:agent ask the server for new tasks");
+		
 		//open https socket 
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		Scheme sch=getScheme();
@@ -78,6 +85,73 @@ public class Communicate{
         
         return jsonStr; 
 	}
+	
+	/**
+	 * send ack message to the server 
+	 * @param retMsg - the messge to rerun 
+	 * @param conf - configuration of an agent service 
+	 * @throws AgentServiceException
+	 */
+	public void sendResponse(ACK retMsg,AgentServiceConf conf) throws AgentServiceException{
+		
+		if(retMsg.isOK())
+			logger.info("Comunicate : send ack to the server on task :"+retMsg.getTaskId()); 
+		else 
+			logger.info("Comunicate : send nack to the server on task :"+retMsg.getTaskId());
+		
+		//create http connection with the keystore
+		DefaultHttpClient httpclient = new DefaultHttpClient();
+		Scheme sch=getScheme(); 
+        httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+		
+        //create post request with body  
+        HttpPost postRequest = new HttpPost(conf.getUrlSendAck());               
+    	List <NameValuePair> nvps = makeMsgBody(retMsg,conf.getAgentName());
+    	
+    	
+    	try {
+			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+		} catch (UnsupportedEncodingException e) {
+			throw new AgentServiceException("post the message body in the post reqwest",e);
+		}
+    	
+    	String resString=excutePost(postRequest, httpclient);
+    	
+		
+	}
+
+	public void newImpInform(String impId,AgentServiceConf conf) throws AgentServiceException{
+		
+	     logger.info("Comunicate : sen to server inform about new implementor -"+ impId); 
+	
+		
+		//create http connection with the keystore
+		DefaultHttpClient httpclient = new DefaultHttpClient();
+		Scheme sch;
+		
+		try {
+			sch = getScheme();
+		} catch (AgentServiceException e) {
+			throw new AgentServiceException("can't send the confirm message to server" ,e); 
+		} 
+        httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+		
+        //create post request with body  
+        HttpPost postRequest = new HttpPost(conf.getUrlSendAck()); 
+        List <NameValuePair> nvps=new ArrayList<NameValuePair>(); 
+  	  	nvps.add(new BasicNameValuePair("agentId",conf.getAgentName()));
+  	  	nvps.add(new BasicNameValuePair("impId",impId));
+    	    	    	
+    	try {
+			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+		} catch (UnsupportedEncodingException e) {
+			throw new AgentServiceException("post the message body in the post reqwest",e);
+		}
+    	
+    	String resString=excutePost(postRequest, httpclient);
+		
+	}
+	
 	
 	/**
 	 * exucte post method 
@@ -152,33 +226,6 @@ public class Communicate{
         
 	}
 
-	/**
-	 * send ack message to the server 
-	 * @param retMsg - the messge to rerun 
-	 * @param conf - configuration of an agent service 
-	 * @throws AgentServiceException
-	 */
-	public void sendResponse(ACK retMsg,AgentServiceConf conf) throws AgentServiceException{
-		
-		//create http connection with the keystore
-		DefaultHttpClient httpclient = new DefaultHttpClient();
-		Scheme sch=getScheme(); 
-        httpclient.getConnectionManager().getSchemeRegistry().register(sch);
-		
-        //create post request with body  
-        HttpPost postRequest = new HttpPost(conf.getUrlSendAck());               
-    	List <NameValuePair> nvps = makeMsgBody(retMsg,conf.getAgentName());
-    	
-    	
-    	try {
-			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-		} catch (UnsupportedEncodingException e) {
-			throw new AgentServiceException("post the message body in the post reqwest",e);
-		}
-    	
-    	String resString=excutePost(postRequest, httpclient);
-		
-	}
 	
 	/*
 	 * build the message body 
@@ -206,6 +253,7 @@ public class Communicate{
         else{
         	nvps.add(new BasicNameValuePair("isOk", "false"));
         	nvps.add(new BasicNameValuePair("errorMsg",retMsg.getErrorMsg())); 
+        	nvps.add(new BasicNameValuePair("fullException",retMsg.getFullExceptionString()));
         }
         
        
@@ -213,6 +261,10 @@ public class Communicate{
 
 	}
 	
+	/*
+	 * return a Scheme for https connection with the keystore 
+	 * and the trust store of the agent service 
+	 */
 	private Scheme getScheme() throws AgentServiceException{
 		
 		

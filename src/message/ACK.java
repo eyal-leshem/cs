@@ -54,6 +54,9 @@ public class ACK {
 		this.data = data;
 	}
 	public String getTaskId() {
+		if(taskId==null){
+			return "0"; 
+		}
 		return taskId;
 	}
 	public void setTaskId(String taskId) {

@@ -7,24 +7,28 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import Logger.AgentServiceLogger;
+import Manager.AgentServiceConf;
+import Manager.Communicate;
+
 import exceptions.AgentServiceException;
 
 import message.Message;
 
 public class PluginManger implements Observer {
 	
-	PluginFactory 						pluginFactory;
+	PluginFactory 						pluginFactory=PluginFactory.getInstance();
 	ListenPluginDir 					watcher;//listener for the changes in folder
 	Map<String,Implementor> 			implemtors=new HashMap<String,Implementor>();
 	static PluginManger 				inst=null;
+	AgentServiceConf					conf=null; 
 	
 	
 	public PluginManger() throws AgentServiceException {
 		
-	
+		//plugins path 
 		String pluginDirPath=new File(".").getAbsolutePath()+System.getProperty("file.separator")+"plugins"; 
-		
-		PluginFactory pluginFactory=new PluginFactory(); 
+			
 		ArrayList<Implementor> implemtorArr;
 		
 		
@@ -35,9 +39,16 @@ public class PluginManger implements Observer {
 			throw new AgentServiceException("can't load the arraylist of plugins", e);
 		}
 			
-			//put it on hashmap 
+		Communicate net= new Communicate(); 
+		//put the implementors into an hash-map  
 		for (Implementor implementor : implemtorArr) {
-				implemtors.put(implementor.getName(),implementor); 
+			    if(implemtors.containsKey(implementor.getName())){
+			    	 ImplemntorNameNotAvailable();
+			   }
+			    else{
+			    	implemtors.put(implementor.getName(),implementor); 
+			    	net.newImpInform(implementor.getName(), conf); 
+			    }
 		}	
 			
 		 
@@ -45,6 +56,9 @@ public class PluginManger implements Observer {
 		
 	}
 	
+	public void setConf(AgentServiceConf conf) {
+		this.conf=conf;
+	}
 	
 	public static PluginManger getInstance() throws Exception{
 		if(inst==null){
@@ -67,6 +81,7 @@ public class PluginManger implements Observer {
 	{
 		watcher = new ListenPluginDir();
 		watcher.addObserver(this);
+		watcher.setFolderPath(folderPath); 
 		
 		//start watcher thread
 		new Thread(new Runnable(){
@@ -121,8 +136,16 @@ public class PluginManger implements Observer {
 					//if the file was a correct jar
 					if(implementor != null)
 					{
-						//add the object to implementors map
-						implemtors.put(implementor.getName(), implementor);
+						if(implemtors.containsKey(implementor.getName()))
+						{
+						  ImplemntorNameNotAvailable();
+						}
+						else{
+							//add the object to implementors map
+							implemtors.put(implementor.getName(), implementor);
+							Communicate net= new Communicate(); 
+							net.newImpInform(implementor.getName(),conf); 
+						}
 					}
 				}
 			}
@@ -143,6 +166,12 @@ public class PluginManger implements Observer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+
+
+	private void ImplemntorNameNotAvailable() {
+		// TODO Auto-generated method stub
 		
 	}
 

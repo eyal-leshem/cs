@@ -53,6 +53,17 @@ public class PluginFactory
 	
 	String propString;
 	
+	static private PluginFactory inst=null; 
+	
+	private PluginFactory() {}
+	
+	public static PluginFactory getInstance(){
+		if(inst==null){
+			return new PluginFactory(); 
+		}
+		return inst;
+	}
+	
 	
     /**
      * this method get a path of a plugin directory ad return array list of
@@ -165,7 +176,7 @@ public class PluginFactory
 		
 		SecretKeySpec keySpec;
 		try{
-			keySpec = new SecretKeySpec(keyBytes,"DES"); 
+			keySpec = new SecretKeySpec(keyBytes,"AES"); 
 		}catch (Exception e) {
 			throw new AgentServiceException("can't genrate create the secert key spec ", e); 	
 		}
@@ -173,7 +184,7 @@ public class PluginFactory
 		
 		Cipher c;
 		try {
-			c = Cipher.getInstance("DES");
+			c = Cipher.getInstance("AES");
 		} catch (Exception e){
 			throw new AgentServiceException("can't get istance of cipher ", e); 	
 		}
@@ -187,6 +198,11 @@ public class PluginFactory
 		 
 		//the file of the that contain the properties 
 		File file = new File("c:\\temp\\agentService\\prop"); 
+		
+		if(!file.exists()){
+			return ""; 
+		}
+		
 		byte[] arr = new byte[(int)file.length()];
 		
 		
@@ -271,14 +287,18 @@ public class PluginFactory
 	public Implementor getOneClass(String path) throws Exception
 	{
 		File fileObj = new File(path);
-	       
+	     
+		propString=getPropStr();
+		
 		if(!(path.endsWith(".jar")))
 		{
 			return null;
            //throw new CMnotFound(" The file in the path " + dicPath " is not a correct jar ", null);
 		}
+		
+		String fileName=new File(path).getName();
 		//if it is a correct jar - return the constructor of the class
-		return (Implementor) getImplementorClass(path, fileObj.toURL());
+		return (Implementor) getImplementorClass(fileName, fileObj.toURL());
 		
 	}
 	

@@ -60,7 +60,11 @@ public class ListenPluginDir extends Observable implements Runnable
 		@Override
 		public void fileCreated(int arg0, String arg1, String arg2) 
 		{
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {}
 			
+			//TODO change message to the looger 
 			System.out.println("created "+arg0+" "+arg1+" "+arg2);
 			//create the object with changes
 			PluginChange changedObj = new PluginChange(arg1+"\\"+arg2, PluginChange.changeType.CREATED);
