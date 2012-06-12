@@ -1,6 +1,7 @@
 {	 
 	 "agentName":"eyal" ,  	
 	 "urlSendAck":"https://localhost/MA/getAck.php" ,
-	 "urlGetTask":"https://localhost/MA/getTasks.php?XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=13384957757644" ,  
-	 "sleepTime":3 
+	 "urlGetTask":"https://localhost/MA/getTasks.php" ,  
+	 "sleepTime":3 , 
+	 "urlNewImplemtor":"https://localhost/MA/newImp.php"
 }
