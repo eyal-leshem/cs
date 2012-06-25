@@ -25,6 +25,9 @@ public class CommandFactory {
 		if(msg.getKind().equals("generate secret"))			return new GenrateSecertCommand();
 		if(msg.getKind().equals("install cert"))        	return new InstallCertCommand(); 	
 		if(msg.getKind().equals("install secret"))			return new InstallSecertCommand(); 
+		if(msg.getKind().equals("change conf"))				return new ChangeConfCommand();
+		if(msg.getKind().equals("remove certifcate"))		return new DelCertCommand();
+		if(msg.getKind().equals("add to crl"))				return new AddToCrlCommand();
 		
 		
 		throw new  AgentServiceException("no such task suiteable to - "+msg.getKind()); 

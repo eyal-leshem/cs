@@ -1,7 +1,1 @@
-{	 
-	 "agentName":"eyal" ,  	
-	 "urlSendAck":"https://localhost/MA/getAck.php" ,
-	 "urlGetTask":"https://localhost/MA/getTasks.php" ,  
-	 "sleepTime":3 , 
-	 "urlNewImplemtor":"https://localhost/MA/newImp.php"
-}
+{"agentName":"yoni","sleepTime":5,"urlSendAck":"https://localhost/SendAck","urlNewImplemtor":"https://localhost/newImp","urlGetTask":"https://localhost/getTasks"}

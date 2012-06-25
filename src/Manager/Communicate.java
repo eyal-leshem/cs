@@ -44,6 +44,12 @@ public class Communicate{
 	private final String pattern="*****";
 	
 	static AgentServiceLogger logger= AgentServiceLogger.getInstance(); 
+	
+	private  AgentServiceConf conf;
+	
+	public Communicate() throws AgentServiceException {
+		conf=AgentServiceConf.getInstance(); 
+	}
 
 	/**
 	 * ans the server for new task 
@@ -52,7 +58,7 @@ public class Communicate{
 	 * @return string that contain an json task description
 	 * @throws AgentServiceException
 	 */
-	public String getNewTasks(AgentServiceConf conf) throws AgentServiceException{
+	public String getNewTasks() throws AgentServiceException{
 		
 		logger.info("comunicate:agent ask the server for new tasks");
 		
@@ -86,13 +92,18 @@ public class Communicate{
         return jsonStr; 
 	}
 	
+	
+	public void sendResponse(ACK retMsg,AgentServiceConf conf) throws AgentServiceException{
+		this.conf=conf; 
+		sendResponse(retMsg); 
+	}
 	/**
 	 * send ack message to the server 
 	 * @param retMsg - the messge to rerun 
 	 * @param conf - configuration of an agent service 
 	 * @throws AgentServiceException
 	 */
-	public void sendResponse(ACK retMsg,AgentServiceConf conf) throws AgentServiceException{
+	public void sendResponse(ACK retMsg) throws AgentServiceException{
 		
 		if(retMsg.isOK())
 			logger.info("Comunicate : send ack to the server on task :"+retMsg.getTaskId()); 
@@ -161,14 +172,16 @@ public class Communicate{
 	 * @throws AgentServiceException
 	 */
 	private String excutePost(HttpPost postRequest, DefaultHttpClient httpclient) throws AgentServiceException {
-        //excute the methos 
+      
+		//excute the methos 
         HttpResponse response;
 		try {
 			response = httpclient.execute(postRequest);
 		} catch (Exception e){
 			throw new AgentServiceException("problem while excuting post method", e);  
 		}
-        HttpEntity  entity= response.getEntity(); 
+       
+		HttpEntity  entity= response.getEntity(); 
         
         //get the data from the response into inputstraem 
         InputStream in;

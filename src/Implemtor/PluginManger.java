@@ -31,6 +31,7 @@ public class PluginManger implements Observer {
 			
 		ArrayList<Implementor> implemtorArr;
 		
+		conf=AgentServiceConf.getInstance(); 
 		
 		//load the implemtor array 
 		try {
@@ -56,9 +57,7 @@ public class PluginManger implements Observer {
 		
 	}
 	
-	public void setConf(AgentServiceConf conf) {
-		this.conf=conf;
-	}
+
 	
 	public static PluginManger getInstance() throws Exception{
 		if(inst==null){

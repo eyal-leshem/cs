@@ -3,6 +3,8 @@ package Implemtor;
 
 import java.util.Observable;
 
+import Logger.AgentServiceLogger;
+
 import exceptions.AgentServiceException;
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
@@ -12,6 +14,8 @@ import net.contentobjects.jnotify.JNotifyListener;
 public class ListenPluginDir extends Observable implements Runnable  
 {
 
+	private AgentServiceLogger logger=AgentServiceLogger.getInstance(); 
+	
 	String folderPath = "";
 	volatile boolean pause;
 	volatile boolean stop;
@@ -64,7 +68,7 @@ public class ListenPluginDir extends Observable implements Runnable
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {}
 			
-			//TODO change message to the looger 
+			logger.info("the listen where service interupt - new file cerated  : " +arg0+" "+arg1+" "+arg2); 
 			System.out.println("created "+arg0+" "+arg1+" "+arg2);
 			//create the object with changes
 			PluginChange changedObj = new PluginChange(arg1+"\\"+arg2, PluginChange.changeType.CREATED);
@@ -85,7 +89,7 @@ public class ListenPluginDir extends Observable implements Runnable
 		@Override
 		public void fileModified(int arg0, String arg1, String arg2) 
 		{
-			// TODO Auto-generated method stub
+			
 			System.out.println("modified "+arg1+" "+arg2);
 			//DirDataChanges changedObj = new DirDataChanges(arg1+"\\"+arg2, "Modified", new Date());
 			//call the method that will notify to all observers about the changes
@@ -95,7 +99,7 @@ public class ListenPluginDir extends Observable implements Runnable
 		@Override
 		public void fileRenamed(int arg0, String arg1, String arg2, String arg3) 
 		{
-			// TODO Auto-generated method stub
+			
 			System.out.println("renamed "+arg2+" "+arg3);
 			//DirDataChanges changedObj = new DirDataChanges(arg1+"\\"+arg2, "Renamed", arg1+"\\"+arg3);
 			//call the method that will notify to all observers about the changes
@@ -111,7 +115,7 @@ public class ListenPluginDir extends Observable implements Runnable
 	@Override
 	public void run() 
 	{
-		// TODO Auto-generated method stub
+		
 		int mask = JNotify.FILE_CREATED
 	       | JNotify.FILE_DELETED
 	       | JNotify.FILE_MODIFIED

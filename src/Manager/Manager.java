@@ -32,7 +32,7 @@ public class Manager {
 	 */
 	public static void main(String[] args)  {
 		
-		Communicate net=new Communicate();
+		
 		AgentServiceLogger logger=AgentServiceLogger.getInstance();
 		logger.init();		
 		
@@ -40,17 +40,18 @@ public class Manager {
 		try {
 			getConf();
 			
+			Communicate net=new Communicate();
 			
 			//install all models 			 
-			Parser parser=new Parser(); 	
-			ImplementorManager.setConf(conf); 
+			Parser parser=new Parser();
 			ImplementorManager impManager=ImplementorManager.getInstance(); 
-			
+		 
+					
 			//run for ever 
 			while(true){
 				
 				//get and updates from the net 
-				String updates=net.getNewTasks(conf);
+				String updates=net.getNewTasks();
 				
 				if(updates!=null&&!updates.equals("null")){
 					ArrayList<Message> messages = null;
@@ -73,7 +74,7 @@ public class Manager {
 					if(messages!=null){
 						for(Message msg:messages){
 							ACK retMsg=impManager.commitTask(msg);
-							net.sendResponse(retMsg,conf); 
+							net.sendResponse(retMsg); 
 						}	
 					}
 					
@@ -88,7 +89,7 @@ public class Manager {
 			}//end of while(true) 
 			
 		} catch (AgentServiceException e1) {
-			unCatchException(e1,conf,net); 
+			unCatchException(e1,conf); 
 		} 
 	}
 
@@ -98,9 +99,16 @@ public class Manager {
 	 * @param conf - agnet configration 
 	 * @param net  - the communicate module for sending the task 
 	 */
-	private static void unCatchException(AgentServiceException e1,AgentServiceConf conf,Communicate net) {
+	private static void unCatchException(AgentServiceException e1,AgentServiceConf conf) {
 		//error while parsing send acknowledgment to the server  
 		
+		Communicate net;
+		try {
+			net = new Communicate();
+		} catch (AgentServiceException e3) {
+			//the agent will be dead without notice to server because problem in connection 
+			return ;
+		} 
 		String errorMsg=conf.getAgentName()+"- Unexpected error : "+e1.getMessage()+"\n"+"agent fall - RIP";  
 		
 		ACK ack=new ACK(); 
@@ -150,7 +158,8 @@ public class Manager {
 		String jsonConfStr=new String(buffer); 
 		
 	    //and use the json conf contractor 
-	   conf= new AgentServiceConf(jsonConfStr); 
+	   conf= AgentServiceConf.IntallConf(jsonConfStr); 
+	   
 		
 	}
 

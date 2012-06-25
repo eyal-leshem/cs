@@ -36,6 +36,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.SecretKeySpec;
 
+import Logger.AgentServiceLogger;
+
 import exceptions.AgentServiceException;
 
 
@@ -44,6 +46,8 @@ import exceptions.AgentServiceException;
 
 public class PluginFactory
 {
+	
+	AgentServiceLogger logger= AgentServiceLogger.getInstance(); 
 	
 	URL[]  urls;
 	
@@ -102,16 +106,16 @@ public class PluginFactory
        for(int i=0; i < files.length; i++)
        {
     	   //get the name of file 
-           String str = files[i].getName();
+           String fileName = files[i].getName();
            //only jar files can contain a plugin 
-           if(str.endsWith(".jar"))
+           if(fileName.endsWith(".jar"))
            {      
         	   try{
         		   //get the constructor of the jar and insert into array of c-tors
-        		   arr.add((Implementor) getImplementorClass(str, files[i].toURL()));
+        		   arr.add((Implementor) getImplementorClass(fileName , files[i].toURL()));
         	   }
         	   catch (Exception e) {
-				  //TODO say to logger that can't add this class 
+				 logger.error("problem to add plugin from file" + fileName+ "problem is : " + e.getMessage());
 			}
            }
        }

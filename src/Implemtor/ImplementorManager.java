@@ -18,7 +18,7 @@ public class ImplementorManager {
 	static 			ImplementorManager 		inst=null;	
 	private			CommandFactory			commandFactory=CommandFactory.getInstance(); 
 	private static 	PluginManger 			pluginManger; 
-	private static  AgentServiceLogger		logger; 
+	private static  AgentServiceLogger		logger=AgentServiceLogger.getInstance(); 
 
 
 	
@@ -40,7 +40,7 @@ public class ImplementorManager {
 	
 	private ImplementorManager() throws AgentServiceException  {
 		
-		
+			conf= AgentServiceConf.getInstance(); 
 			try {
 				pluginManger=PluginManger.getInstance();
 			} catch (Exception e) {
@@ -61,7 +61,8 @@ public class ImplementorManager {
 			//get the implementor 
 			Implementor imp=getImplemntor(msg);			
 			try{
-				if (imp==null)	noSouchImp(msg.getImplementorID()); 
+				//implemtor nop mean mission for agent without  implemtor 
+				if (imp==null && !msg.getImplementorID().equals("nop"))	noSouchImp(msg.getImplementorID()); 
 				
 				//Execute the command 
 				Command command=commandFactory.getCommand(msg); 
@@ -82,8 +83,15 @@ public class ImplementorManager {
 			
 			//the relevant properties for each ack 
 			finally{
-				ack.setTaskId(msg.getID()); 
-				ack.setImplemntorName(imp.getName());
+				ack.setTaskId(msg.getID());
+				
+				//get the implementor name
+				if(imp!=null)
+					ack.setImplemntorName(imp.getName());
+				else 
+					ack.setImplemntorName("nop"); 
+				
+				//report to the log on error 
 				logger.error("implemtor  '"+msg.getImplementorID()+"' perfrom task "+ msg.getID());
 			}
 		} 
@@ -102,10 +110,7 @@ public class ImplementorManager {
 		return conf;
 	}
 	
-	public static void setConf(AgentServiceConf conf) {
-		pluginManger.setConf(conf);
-		ImplementorManager.conf = conf;
-	}
+
 
 	
 

@@ -2,6 +2,8 @@ package Manager;
 
 import org.json.*;
 
+import Implemtor.PluginManger;
+
 import exceptions.AgentServiceException;
 
 public class AgentServiceConf {
@@ -13,8 +15,10 @@ public class AgentServiceConf {
 
 	private		int	   sleepTime; 
 	
+	private	static AgentServiceConf inst=null;  
 	
-	public AgentServiceConf(String jsonConfStr) throws AgentServiceException  {
+	
+	private AgentServiceConf(String jsonConfStr) throws AgentServiceException  {
 		JSONObject json;
 	
 		try{
@@ -29,16 +33,22 @@ public class AgentServiceConf {
 			
 		}catch (JSONException e) {
 			throw new AgentServiceException("can't parse legal json from the string :\n "+jsonConfStr,e); 
-		}
-		
-		
-		
-		
-		
+		}	
+				
+				
 	}
 	
+	public static AgentServiceConf IntallConf(String jsonStr) throws AgentServiceException{
+		AgentServiceConf conf=new AgentServiceConf(jsonStr); 
+		inst=conf; 
+		return inst;
+	}
 	
-	
+	public static AgentServiceConf getInstance() throws AgentServiceException{
+		if(inst==null)
+			throw new AgentServiceException("need to install befor use via IntallConf(String jsonStr)");
+		return inst; 
+	}
 	
 	//////setters and geter's 
 	public int getSleepTime() {

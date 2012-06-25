@@ -1,6 +1,9 @@
 package Commands;
 
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+
+import sun.security.provider.X509Factory;
 import java.security.cert.CertificateEncodingException;
 
 import exceptions.AgentServiceException;
@@ -13,8 +16,8 @@ import Implemtor.ImplementorExcption;
 
 public class GenrateKeyPairCommand implements Command {
 	
-	final String beginCertString="-----BEGIN CERTIFICATE-----\r\n"; 
-	final String endCertString="\r\n-----END CERTIFICATE-----\r\n"; 
+	final String beginCertString=X509Factory.BEGIN_CERT; 
+	final String endCertString=X509Factory.END_CERT; 
 
 	@Override
 	public ACK excute(Implementor imp,Message msg) throws AgentServiceException {
@@ -24,7 +27,7 @@ public class GenrateKeyPairCommand implements Command {
 		//tell the implementor to generate key pair and return 
 		//the certificate 
 		try {
-			cert = imp.genrateKeyPair("cn=a,ou=a,o=a,l=a,s=a,c=a");
+			cert = imp.genrateKeyPair("cn=a,ou=a,o=a,l=a,s=a,c=a");			
 		} catch (ImplementorExcption e1) {
 			throw new AgentServiceException("implemtor can't genrate key pair from certificate ", e1); 
 		}
@@ -41,7 +44,7 @@ public class GenrateKeyPairCommand implements Command {
 		
 		//encode it in base64 
 		String crtBody=base64Encoder.encode(certBytes); 
-		String crtFinal=beginCertString+crtBody+endCertString; 		
+		String crtFinal=beginCertString+"\r\n"+crtBody+"\r\n"+endCertString; 		
 		
 		//set the relvant data to the ack 
 		ACK ret=new ACK();				
