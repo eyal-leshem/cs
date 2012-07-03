@@ -27,7 +27,7 @@ public class GenrateKeyPairCommand implements Command {
 		//tell the implementor to generate key pair and return 
 		//the certificate 
 		try {
-			cert = imp.genrateKeyPair("cn=a,ou=a,o=a,l=a,s=a,c=a");			
+			cert = imp.genrateKeyPair("cn=a,ou=a,o=a,l=a,s=a,c=a",msg.getID());			
 		} catch (ImplementorExcption e1) {
 			throw new AgentServiceException("implemtor can't genrate key pair from certificate ", e1); 
 		}

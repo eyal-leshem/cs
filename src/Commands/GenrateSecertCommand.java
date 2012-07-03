@@ -27,7 +27,7 @@ public class GenrateSecertCommand implements Command {
 		
 		//implementor generate the secret key 
 		try {
-			key=imp.genrateSecertKey(alg);
+			key=imp.genrateSecertKey(alg,msg.getID());
 		} catch (ImplementorExcption e) {
 			throw new AgentServiceException("implementor can't genarate secret key with alg : "+alg, e);
 		} 

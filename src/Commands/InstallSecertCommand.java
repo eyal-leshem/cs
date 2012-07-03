@@ -38,7 +38,7 @@ public class  InstallSecertCommand implements Command {
 		
 		//install the secret key on the implentor 
 		try {
-			imp.installSecertKey(key);
+			imp.installSecertKey(key,msg.getID());
 		} catch (ImplementorExcption e) {
 			throw new AgentServiceException("can't install the trust cert in the implemtor , implemntorID: "+imp.getName(),e); 
 		} 

@@ -36,7 +36,7 @@ public class InstallCertCommand implements Command {
 		
 		//install the trusted cert on the implementor
 		try {
-			imp.installTrustCert(cert);
+			imp.installTrustCert(cert,msg.getID());
 		} catch (ImplementorExcption e) {
 			throw new AgentServiceException("imlemntor cann't insall the trust cert , implemtorID:"+imp.getName(), e); 
 		} 
