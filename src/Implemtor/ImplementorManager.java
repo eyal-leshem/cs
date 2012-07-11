@@ -44,6 +44,7 @@ public class ImplementorManager {
 			try {
 				pluginManger=PluginManger.getInstance();
 			} catch (Exception e) {
+				
 				throw new AgentServiceException("can't get intance of plugin manger",e);
 			}
 			

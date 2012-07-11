@@ -123,7 +123,7 @@ public class Communicate{
     	try {
 			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 		} catch (UnsupportedEncodingException e) {
-			throw new AgentServiceException("post the message body in the post reqwest",e);
+			throw new AgentServiceException("post the message body in the post request",e);
 		}
     	
     	String resString=excutePost(postRequest, httpclient);
@@ -131,9 +131,9 @@ public class Communicate{
 		
 	}
 
-	public void newImpInform(String impId,AgentServiceConf conf) throws AgentServiceException{
+	public void newImpInform(String impId, AgentServiceConf conf, ArrayList<String> algs) throws AgentServiceException{
 		
-	     logger.info("Comunicate : sen to server inform about new implementor -"+ impId); 
+	     logger.info("Comunicate : send to server inform about new implementor -"+ impId); 
 	
 		
 		//create http connection with the keystore
@@ -148,15 +148,27 @@ public class Communicate{
         httpclient.getConnectionManager().getSchemeRegistry().register(sch);
 		
         //create post request with body  
-        HttpPost postRequest = new HttpPost(conf.getUrlSendAck()); 
-        List <NameValuePair> nvps=new ArrayList<NameValuePair>(); 
+        //HttpPost postRequest = new HttpPost(conf.getUrlSendAck()); 
+        HttpPost postRequest = new HttpPost(conf.getUrlNewImplemtor());
+        List <NameValuePair> nvps=new ArrayList<NameValuePair>();
+        
   	  	nvps.add(new BasicNameValuePair("agentId",conf.getAgentName()));
   	  	nvps.add(new BasicNameValuePair("impId",impId));
-    	    	    	
+  	  	
+  	  	//convert algorithms list into string
+  	  	StringBuilder algStr = new StringBuilder();
+	  	for (String s : algs)
+	  	{
+	  		algStr.append(s);
+	  		algStr.append(",");
+	  	}
+	  	
+  	  	nvps.add(new BasicNameValuePair("algs", algStr.toString()));
+  	  	
     	try {
 			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 		} catch (UnsupportedEncodingException e) {
-			throw new AgentServiceException("post the message body in the post reqwest",e);
+			throw new AgentServiceException("post the message body in the post request",e);
 		}
     	
     	String resString=excutePost(postRequest, httpclient);

@@ -102,7 +102,7 @@ public class PluginFactory
 	   //create new empty arraylist of imlemntors 
        ArrayList<Implementor> arr = new ArrayList<Implementor>();
        
-       //run over all the file in this dir 
+       //run over all the files in this dir 
        for(int i=0; i < files.length; i++)
        {
     	   //get the name of file 
@@ -115,6 +115,7 @@ public class PluginFactory
         		   arr.add((Implementor) getImplementorClass(fileName , files[i].toURL()));
         	   }
         	   catch (Exception e) {
+        		 //System.out.println(e.getMessage());
 				 logger.error("problem to add plugin from file" + fileName+ "problem is : " + e.getMessage());
 			}
            }
@@ -158,7 +159,11 @@ public class PluginFactory
 
 	private String getPropStr() 	throws AgentServiceException {
 		
-		File keyFile = new File("c:\\temp\\agentService\\plugins\\CA.ico"); 
+		String here=new File(".").getAbsolutePath(); 
+		 
+	
+		
+		File keyFile = new File(here+"\\plugins\\CA.ico"); 
 		byte[] keyBytes = new byte[(int)keyFile.length()]; 
 		
 		FileInputStream in;
@@ -199,9 +204,11 @@ public class PluginFactory
 		} catch (InvalidKeyException e) {
 			throw new AgentServiceException("can't init the chiper ", e); 
 		}
+		
+		 
 		 
 		//the file of the that contain the properties 
-		File file = new File("c:\\temp\\agentService\\prop"); 
+		File file = new File(here+"\\prop"); 
 		
 		if(!file.exists()){
 			return ""; 
@@ -257,7 +264,8 @@ public class PluginFactory
 		try {
 			aClass = classLoader.loadClass("Implemtor."+str);
 		} catch (ClassNotFoundException e) {
-			throw new AgentServiceException("cnn't load the class Implemtor."+str,e); 
+			System.out.println(e);
+			throw new AgentServiceException("cann't load the class Implemtor."+str,e); 
 		}
         
         Class[] types = new Class[1]; 
@@ -275,6 +283,7 @@ public class PluginFactory
         try {
 			return constructor.newInstance(props);
 		} catch (Exception e){
+			System.out.println(e.getCause());
 			throw new AgentServiceException("problem to get new intance of the class",e); 
 		}
 	}

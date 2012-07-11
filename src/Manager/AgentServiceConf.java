@@ -1,5 +1,7 @@
 package Manager;
 
+import java.util.ArrayList;
+
 import org.json.*;
 
 import Implemtor.PluginManger;
@@ -12,7 +14,7 @@ public class AgentServiceConf {
 	private		String urlSendAck;
 	private		String urlGetTask; 
 	private		String urlNewImplemtor; 
-
+	
 	private		int	   sleepTime; 
 	
 	private	static AgentServiceConf inst=null;  
@@ -72,6 +74,14 @@ public class AgentServiceConf {
 	public String getUrlGetTask() {
 		return urlGetTask;
 	}
+	public String getUrlNewImplemtor() {
+		return urlNewImplemtor;
+	}
+
+	public void setUrlNewImplemtor(String urlNewImplemtor) {
+		this.urlNewImplemtor = urlNewImplemtor;
+	}
+
 	public void setUrlGetTask(String urlGetTask) {
 		this.urlGetTask = urlGetTask;
 	}

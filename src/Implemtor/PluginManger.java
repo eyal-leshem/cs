@@ -24,7 +24,7 @@ public class PluginManger implements Observer {
 	AgentServiceConf					conf=null; 
 	
 	
-	public PluginManger() throws AgentServiceException {
+	public PluginManger() throws AgentServiceException, ImplementorExcption {
 		
 		//plugins path 
 		String pluginDirPath=new File(".").getAbsolutePath()+System.getProperty("file.separator")+"plugins"; 
@@ -42,13 +42,14 @@ public class PluginManger implements Observer {
 			
 		Communicate net= new Communicate(); 
 		//put the implementors into an hash-map  
-		for (Implementor implementor : implemtorArr) {
+		for (Implementor implementor : implemtorArr) 
+		{
 			    if(implemtors.containsKey(implementor.getName())){
 			    	 ImplemntorNameNotAvailable();
-			   }
+			   }	
 			    else{
 			    	implemtors.put(implementor.getName(),implementor); 
-			    	net.newImpInform(implementor.getName(), conf); 
+			    	net.newImpInform(implementor.getName(), conf, implementor.getAlgorithms()); 
 			    }
 		}	
 			
@@ -143,7 +144,7 @@ public class PluginManger implements Observer {
 							//add the object to implementors map
 							implemtors.put(implementor.getName(), implementor);
 							Communicate net= new Communicate(); 
-							net.newImpInform(implementor.getName(),conf); 
+							net.newImpInform(implementor.getName(),conf, implementor.getAlgorithms()); 
 						}
 					}
 				}
