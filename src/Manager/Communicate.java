@@ -163,7 +163,8 @@ public class Communicate{
 	  		algStr.append(",");
 	  	}
 	  	
-  	  	nvps.add(new BasicNameValuePair("algs", algStr.toString()));
+	  	String str=algStr.toString();
+  	  	nvps.add(new BasicNameValuePair("algs",str));
   	  	
     	try {
 			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
@@ -202,7 +203,7 @@ public class Communicate{
 		} catch (Exception e){
 			throw new AgentServiceException("problem to get the data from the response", e);
 		}
-		
+		System.out.println(entity.getContentLength());
 	     
 		//read the answer into a byte array and make string from it 
 		byte[] ans=new byte[(int)entity.getContentLength()];
