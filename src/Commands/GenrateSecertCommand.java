@@ -46,7 +46,7 @@ public class GenrateSecertCommand implements Command {
 		ACK ret=new ACK();				
 		ret.setData(stringKey); 
 		ret.setDataAlg(alg);
-		ret.setDataKind("certificate");
+		ret.setDataKind("secret key");
 		
 		
 		return ret;
