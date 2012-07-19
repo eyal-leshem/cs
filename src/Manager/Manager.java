@@ -64,9 +64,10 @@ public class Manager {
 						//error while parsing send acknowledgment to the server  
 						ACK ack=new ACK(); 
 						ack.setOK(false); 
-						ack.setErrorMsg("problem to parse update string -"+updates); 
+						ack.setErrorMsg("problem to parse the update string may worng format ? "); 
 						ack.setFullExceptionString(ExceptionHelper.getCustomStackTrace(e)); 
 						ack.setTaskId("0"); 
+						ack.setImplemntorName("no imp");
 						net.sendResponse(ack, conf); 
 					}
 					

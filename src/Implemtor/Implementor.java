@@ -10,8 +10,6 @@ import javax.crypto.SecretKey;
 public abstract class Implementor {
 	
 	protected String name;
-	
-	
 	public Implementor() {
 		// TODO Auto-generated constructor stub
 	}
@@ -33,16 +31,6 @@ public abstract class Implementor {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	public ArrayList<String> getAlgorithms() throws ImplementorExcption{
-		throw new ImplementorExcption("unimplemnt method"); 
-		
-	}
-
-	public void setAlgorithms(String algorithms) throws ImplementorExcption{
-		throw new ImplementorExcption("unimplemnt method"); 
-			
 	}
 
 	public Certificate	genrateKeyPair(String dName,String alias) throws ImplementorExcption{
@@ -66,7 +54,11 @@ public abstract class Implementor {
 	}
 	
 	public boolean		removeCertificate(BigInteger serialNumber)  throws ImplementorExcption{
-		throw new ImplementorExcption("unimplemnt metho"); 
+		throw new ImplementorExcption("unimplemnt method"); 
+	}
+
+	public ArrayList<String> getAlgorithms() throws ImplementorExcption{
+		return new ArrayList<String>(); 
 	}
 		
 }

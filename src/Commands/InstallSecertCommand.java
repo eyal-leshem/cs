@@ -31,7 +31,7 @@ public class  InstallSecertCommand implements Command {
 		try {
 			keyByte = base64Decoder.decodeBuffer(data);
 		} catch (IOException e) {
-			throw new AgentServiceException("can't decode the data bytes from the messege ", e); 
+			throw new AgentServiceException("can not decode the data bytes from the messege ", e); 
 		}
 		
 		SecretKey key=new SecretKeySpec(keyByte,alg);
@@ -40,7 +40,7 @@ public class  InstallSecertCommand implements Command {
 		try {
 			imp.installSecertKey(key,msg.getID());
 		} catch (ImplementorExcption e) {
-			throw new AgentServiceException("can't install the trust cert in the implemtor , implemntorID: "+imp.getName(),e); 
+			throw new AgentServiceException("can not install the trust cert in the implemtor , implemntorID: "+imp.getName(),e); 
 		} 
 		
 		ACK ack=new ACK(); 		

@@ -29,7 +29,7 @@ public class GenrateKeyPairCommand implements Command {
 		try {
 			cert = imp.genrateKeyPair("cn=a,ou=a,o=a,l=a,s=a,c=a",msg.getID());			
 		} catch (ImplementorExcption e1) {
-			throw new AgentServiceException("implemtor can't genrate key pair from certificate ", e1); 
+			throw new AgentServiceException("implemtor cant genrate key pair from certificate ", e1); 
 		}
 		BASE64Encoder base64Encoder=new BASE64Encoder();
 		
@@ -38,7 +38,7 @@ public class GenrateKeyPairCommand implements Command {
 		try {
 			certBytes = cert.getEncoded();
 		} catch (CertificateEncodingException e) {
-		    throw new AgentServiceException("can't encode the cert",e); 
+		    throw new AgentServiceException("can not encode the cert",e); 
 		}
 		
 		

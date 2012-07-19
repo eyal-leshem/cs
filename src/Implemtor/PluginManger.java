@@ -161,11 +161,7 @@ public class PluginManger implements Observer {
 			}
 			
 		} 
-		catch (Exception e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		catch (Exception e) {/*a bad plugin*/	}
 		
 	}
 

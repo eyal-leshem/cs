@@ -23,7 +23,7 @@ public class InstallCertCommand implements Command {
 		try {
 			cf = CertificateFactory.getInstance(msg.getAlg());
 		} catch (CertificateException e) {
-			throw new AgentServiceException("can't genrate certifcate factory with alogrithem :"+msg.getAlg() ,e);
+			throw new AgentServiceException("can not genrate certifcate factory with alogrithem :"+msg.getAlg() ,e);
 		} 
 		
 		//genrate certificate from the data 
@@ -31,14 +31,14 @@ public class InstallCertCommand implements Command {
 		try {
 			cert = cf.generateCertificate(new ByteArrayInputStream(msg.getMsgData().getBytes()));
 		} catch (CertificateException e) {
-			throw new AgentServiceException("can't genrate cerrificate from the msg data", e);
+			throw new AgentServiceException("can not genrate cerrificate from the msg data", e);
 		} 
 		
 		//install the trusted cert on the implementor
 		try {
 			imp.installTrustCert(cert,msg.getID());
 		} catch (ImplementorExcption e) {
-			throw new AgentServiceException("imlemntor cann't insall the trust cert , implemtorID:"+imp.getName(), e); 
+			throw new AgentServiceException("imlemntor can not insall the trust cert , implemtorID:"+imp.getName(), e); 
 		} 
 		
 		ACK ack=new ACK(); 

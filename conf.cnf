@@ -1,1 +1,1 @@
-{"agentName":"eyal","sleepTime":5,"urlSendAck":"https://localhost/SendAck","urlGetTask":"https://localhost/getTasks","urlNewImplemtor":"https://localhost/newImp"}
+{"agentName":"eyal","sleepTime":1,"urlSendAck":"https://localhost/SendAck","urlNewImplemtor":"https://localhost/newImp","urlGetTask":"https://localhost/getTasks"}

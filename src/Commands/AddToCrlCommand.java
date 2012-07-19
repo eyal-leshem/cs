@@ -14,7 +14,13 @@ public class AddToCrlCommand implements Command {
 	public ACK excute(Implementor imp, Message msg)
 			throws AgentServiceException {
 		
-			BigInteger serial=new BigInteger(msg.getMsgData());
+			//get the serial number form msg data
+			BigInteger serial;
+			try{
+				serial=new BigInteger(msg.getMsgData());
+			}catch (Exception e) {
+				throw new AgentServiceException("can't create big integer from seriral number -"+msg.getMsgData(), e); 
+			}
 			
 			//call to implementor that will ad it to crl 
 			try {

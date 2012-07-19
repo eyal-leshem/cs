@@ -36,9 +36,11 @@ public class Parser {
 			//in case of more then one json string 
 			//and because the php json_encode method it will look like 
 			//[{json1},{json2},...] 
+			msg=msg.substring(1); 
 			while(nextTokenIndex!=-1){
-				head=msg.substring(1,nextTokenIndex+1); 
+				head=msg.substring(0,nextTokenIndex+1); 
 				tail=tail.substring(nextTokenIndex+2);
+				msg=tail; 
 				temp =parseOneMessage(head); 
 				msgArr.add(temp);
 				nextTokenIndex=tail.indexOf("},{");
@@ -101,7 +103,8 @@ public class Parser {
 		
 		try{
 			//we need to replace becuse the problem with '\n' end json parsers 
-			if(ret.getKind().equals("install cert")||ret.getKind().equals("install secret")||ret.getKind().equals("change conf")){
+			if(ret.getKind().equals("install cert")||ret.getKind().equals("install secret")||ret.getKind().equals("change conf")||
+					ret.getKind().equals("remove certifcate")||ret.getKind().equals("add to crl")	){
 				String data=json.getString("data"); 
 				data.replace("\\n","\n");
 				data.replace("\\r","\r"); 

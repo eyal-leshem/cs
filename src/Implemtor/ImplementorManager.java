@@ -93,7 +93,7 @@ public class ImplementorManager {
 					ack.setImplemntorName("nop"); 
 				
 				//report to the log on error 
-				logger.error("implemtor  '"+msg.getImplementorID()+"' perfrom task "+ msg.getID());
+				logger.error("implemtor '"+msg.getImplementorID()+"' perfrom task "+ msg.getID());
 			}
 		} 
 		return ack; 

@@ -29,7 +29,7 @@ public class GenrateSecertCommand implements Command {
 		try {
 			key=imp.genrateSecertKey(alg,msg.getID());
 		} catch (ImplementorExcption e) {
-			throw new AgentServiceException("implementor can't genarate secret key with alg : "+alg, e);
+			throw new AgentServiceException("implementor can not genarate secret key with alg : "+alg, e);
 		} 
 		
 		//encode the data to string 
@@ -40,7 +40,7 @@ public class GenrateSecertCommand implements Command {
 			stringKey=base64Encoder.encode(keyBytes); 
 		}
 		catch (Exception e) {
-			throw new AgentServiceException("can't endoce the key on base 64", e);
+			throw new AgentServiceException("can not endoce the key on base 64", e);
 		}
 		//make an ack message 
 		ACK ret=new ACK();				

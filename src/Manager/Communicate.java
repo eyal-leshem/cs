@@ -80,13 +80,19 @@ public class Communicate{
 		} catch (UnsupportedEncodingException e) {
 			throw new AgentServiceException("problem with post reqwest"); 
 		} 
-        
- 
+         
         String resStr=excutePost(postRequest,httpclient);
-       
+                     
         //get the task form the result 
         int beginJson=resStr.indexOf(pattern)+pattern.length();
         int endJson=resStr.indexOf(pattern,resStr.indexOf(pattern)+1); 
+        
+        //in case of problem in the server, 
+        //the agent can get index index outv o
+        if(beginJson<0 || endJson < 0){
+        	return "null"; 
+        }
+        
         String jsonStr=new String(resStr.substring(beginJson,endJson));  
         
         return jsonStr; 
@@ -203,7 +209,7 @@ public class Communicate{
 		} catch (Exception e){
 			throw new AgentServiceException("problem to get the data from the response", e);
 		}
-		System.out.println(entity.getContentLength());
+		
 	     
 		//read the answer into a byte array and make string from it 
 		byte[] ans=new byte[(int)entity.getContentLength()];
