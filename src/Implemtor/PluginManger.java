@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
+import Commands.newInstanceCommand;
 import Logger.AgentServiceLogger;
 import Manager.AgentServiceConf;
 import Manager.Communicate;
@@ -19,39 +21,51 @@ public class PluginManger implements Observer {
 	
 	PluginFactory 						pluginFactory=PluginFactory.getInstance();
 	ListenPluginDir 					watcher;//listener for the changes in folder
-	Map<String,Implementor> 			implemtors=new HashMap<String,Implementor>();
+	Map<String,Implementor> 			implemtors=new  ConcurrentHashMap<String,Implementor>();
+	Map<String,Class>					plugins=new ConcurrentHashMap<String, Class>(); 
 	static PluginManger 				inst=null;
 	AgentServiceConf					conf=null; 
 	
 	
-	public PluginManger() throws AgentServiceException, ImplementorExcption {
+	public PluginManger() throws AgentServiceException {
 		
 		//plugins path 
 		String pluginDirPath=new File(".").getAbsolutePath()+System.getProperty("file.separator")+"plugins"; 
 			
-		ArrayList<Implementor> implemtorArr;
+		ArrayList<Class> pluginsArray;
 		
 		conf=AgentServiceConf.getInstance(); 
 		
 		//load the implemtor array 
 		try {
-			implemtorArr = pluginFactory.getClassArr(pluginDirPath);
+			pluginsArray = pluginFactory.getClassArr(pluginDirPath);
 		} catch (AgentServiceException e) {
 			throw new AgentServiceException("can't load the arraylist of plugins", e);
 		}
-			
+		
+					
 		Communicate net= new Communicate(); 
+	
 		//put the implementors into an hash-map  
-		for (Implementor implementor : implemtorArr) 
+		for (Class aClass : pluginsArray) 
 		{
-			    if(implemtors.containsKey(implementor.getName())){
-			    	 ImplemntorNameNotAvailable();
-			   }	
-			    else{
-			    	implemtors.put(implementor.getName(),implementor); 
-			    	net.newImpInform(implementor.getName(), conf, implementor.getAlgorithms()); 
-			    }
+			//get class name 
+			String pluginName=aClass.getName().substring("Implemtor.".length());
+			
+			//put in the plugin table and update the server
+			plugins.put( pluginName , aClass ); 
+			net.newImpInform(pluginName, conf); 
 		}	
+		
+		
+		//load the all install instances of that plugin factory   
+		try {
+			PluginInstanceFactory pif=PluginInstanceFactory.getInstance(); 
+			implemtors=pif.getImps(plugins); 
+			
+		} catch (AgentServiceException e) {
+			throw new AgentServiceException("problem to ge the implementors from plugin factory"); 
+		}
 			
 		 
 		
@@ -59,8 +73,7 @@ public class PluginManger implements Observer {
 	}
 	
 
-	
-	public static PluginManger getInstance() throws Exception{
+	public static PluginManger getInstance() throws AgentServiceException{
 		if(inst==null){
 			inst= new PluginManger();
 		}
@@ -131,21 +144,18 @@ public class PluginManger implements Observer {
 			{
 				synchronized (inst)
 				{
-					Implementor implementor = pluginFactory.getOneClass(changeObj.path);
+					Class aClass = pluginFactory.getOneClass(changeObj.path);
 					
+					Communicate net= new Communicate();
 					//if the file was a correct jar
-					if(implementor != null)
+					if(aClass != null)
 					{
-						if(implemtors.containsKey(implementor.getName()))
-						{
-						  ImplemntorNameNotAvailable();
-						}
-						else{
-							//add the object to implementors map
-							implemtors.put(implementor.getName(), implementor);
-							Communicate net= new Communicate(); 
-							net.newImpInform(implementor.getName(),conf, implementor.getAlgorithms()); 
-						}
+						//get class name 
+						String pluginName=aClass.getName().substring("Implemtor.".length());
+						
+						//put in the plugin table and update the server
+						plugins.put( pluginName , aClass ); 
+						net.newImpInform(pluginName, conf); 
 					}
 				}
 			}
@@ -165,11 +175,30 @@ public class PluginManger implements Observer {
 		
 	}
 
+	public String addNewInstance(String plugin,String parms) throws AgentServiceException{
+		
+		PluginInstanceFactory pif=PluginInstanceFactory.getInstance(); 
+		
+		Implementor imp;
+		try {
+			Class pluginClass=plugins.get(plugin); 
+			imp=pif.installNewImplementorInstance(pluginClass,parms);
+		} catch (AgentServiceException e) {
+			throw new AgentServiceException("can not install new instance of this implemntor implemntor"); 
+		} 
+		
+		implemtors.put(imp.getName(),imp); 
+		
+		return imp.getName(); 
+	
+	}
 
 	private void ImplemntorNameNotAvailable() {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 
 
 

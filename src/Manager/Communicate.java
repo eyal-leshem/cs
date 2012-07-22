@@ -137,7 +137,7 @@ public class Communicate{
 		
 	}
 
-	public void newImpInform(String impId, AgentServiceConf conf, ArrayList<String> algs) throws AgentServiceException{
+	public void newImpInform(String impId, AgentServiceConf conf) throws AgentServiceException{
 		
 	     logger.info("Comunicate : send to server inform about new implementor -"+ impId); 
 	
@@ -160,18 +160,7 @@ public class Communicate{
         
   	  	nvps.add(new BasicNameValuePair("agentId",conf.getAgentName()));
   	  	nvps.add(new BasicNameValuePair("impId",impId));
-  	  	
-  	  	//convert algorithms list into string
-  	  	StringBuilder algStr = new StringBuilder();
-	  	for (String s : algs)
-	  	{
-	  		algStr.append(s);
-	  		algStr.append(",");
-	  	}
-	  	
-	  	String str=algStr.toString();
-  	  	nvps.add(new BasicNameValuePair("algs",str));
-  	  	
+  	  	    	  	
     	try {
 			postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 		} catch (UnsupportedEncodingException e) {

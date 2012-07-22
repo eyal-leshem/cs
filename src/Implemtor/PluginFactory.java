@@ -77,7 +77,8 @@ public class PluginFactory
      * @return      array list of implementors
      * @throws      Exception
      */
-   public   ArrayList<Implementor> getClassArr(String dicPath) throws  AgentServiceException
+  
+	public   ArrayList<Class> getClassArr(String dicPath) throws  AgentServiceException
    {
 
        File dic = new File(dicPath);
@@ -100,7 +101,7 @@ public class PluginFactory
 	   files = dic.listFiles();
 
 	   //create new empty arraylist of imlemntors 
-       ArrayList<Implementor> arr = new ArrayList<Implementor>();
+       ArrayList<Class> arr = new ArrayList<Class>();
        
        //run over all the files in this dir 
        for(int i=0; i < files.length; i++)
@@ -112,7 +113,8 @@ public class PluginFactory
            {      
         	   try{
         		   //get the constructor of the jar and insert into array of c-tors
-        		   arr.add((Implementor) getImplementorClass(fileName , files[i].toURL()));
+        		  Class aClass=(Class)getImplementorClass(fileName , files[i].toURL());        		         		    		  
+        		  arr.add(aClass);
         	   }
         	   catch (Exception e) {
         		 //System.out.println(e.getMessage());
@@ -257,8 +259,9 @@ public class PluginFactory
         String props = getRelevantProprties(propString, str); 
         urls = new URL[1];
         urls[0] = url;
-        classLoader = new URLClassLoader(urls); 
+        classLoader = new URLClassLoader(urls);
         
+               
         //get the class object
         Class aClass;
 		try {
@@ -267,7 +270,12 @@ public class PluginFactory
 			System.out.println(e);
 			throw new AgentServiceException("cann't load the class Implemtor."+str,e); 
 		}
-        
+		
+	
+		
+		return aClass; 
+		
+        /*
         Class[] types = new Class[1]; 
         types[0] = String.class; 
         
@@ -285,7 +293,7 @@ public class PluginFactory
 		} catch (Exception e){
 			System.out.println(e.getCause());
 			throw new AgentServiceException("problem to get new intance of the class",e); 
-		}
+		}*/
 	}
 	
 	
@@ -297,7 +305,7 @@ public class PluginFactory
 	 * @return
 	 * @throws Exception
 	 */
-	public Implementor getOneClass(String path) throws Exception
+	public Class getOneClass(String path) throws Exception
 	{
 		File fileObj = new File(path);
 	     
@@ -311,7 +319,7 @@ public class PluginFactory
 		
 		String fileName=new File(path).getName();
 		//if it is a correct jar - return the constructor of the class
-		return (Implementor) getImplementorClass(fileName, fileObj.toURL());
+		return (Class)getImplementorClass(fileName, fileObj.toURL());
 		
 	}
 	

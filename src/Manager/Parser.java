@@ -104,9 +104,11 @@ public class Parser {
 		try{
 			//we need to replace becuse the problem with '\n' end json parsers 
 			if(ret.getKind().equals("install cert")||ret.getKind().equals("install secret")||ret.getKind().equals("change conf")||
-					ret.getKind().equals("remove certifcate")||ret.getKind().equals("add to crl")	){
+					ret.getKind().equals("remove certifcate")||ret.getKind().equals("add to crl")||	ret.getKind().equals("new inst")){
 				String data=json.getString("data"); 
 				data.replace("\\n","\n");
+				data.replace("\\\"","\"");
+				data.replace("\\/","/");
 				data.replace("\\r","\r"); 
 				ret.setMsgData(data,true); 
 				 

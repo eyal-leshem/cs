@@ -28,6 +28,7 @@ public class CommandFactory {
 		if(msg.getKind().equals("change conf"))				return new ChangeConfCommand();
 		if(msg.getKind().equals("remove certifcate"))		return new DelCertCommand();
 		if(msg.getKind().equals("add to crl"))				return new AddToCrlCommand();
+		if(msg.getKind().equals("new inst"))				return new newInstanceCommand();
 		
 		
 		throw new  AgentServiceException("no such task suiteable to - "+msg.getKind()); 
