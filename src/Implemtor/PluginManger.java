@@ -184,7 +184,7 @@ public class PluginManger implements Observer {
 			Class pluginClass=plugins.get(plugin); 
 			imp=pif.installNewImplementorInstance(pluginClass,parms);
 		} catch (AgentServiceException e) {
-			throw new AgentServiceException("can not install new instance of this implemntor implemntor"); 
+			throw new AgentServiceException("can not install new instance of this implemntor implemntor",e); 
 		} 
 		
 		implemtors.put(imp.getName(),imp); 

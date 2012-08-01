@@ -200,7 +200,7 @@ public class PluginInstanceFactory {
 		try{
 			encrypteAndSaveParms(parms,newImp.getName(),plugin.getName().substring("Implemtor.".length())); 
 		}catch (AgentServiceException e) {
-			throw new AgentServiceException("can not save and encrypte the pameters of this instance");
+			throw new AgentServiceException("can not save and encrypte the pameters of this instance",e);
 		}
 		
 		return newImp; 
