@@ -189,9 +189,30 @@ public class PluginManger implements Observer {
 		
 		implemtors.put(imp.getName(),imp); 
 		
-		return imp.getName(); 
+		String algs=getAlgString(imp); 
+		
+		return imp.getName()+","+algs; 
 	
 	}
+
+	private String getAlgString(Implementor imp) throws AgentServiceException {
+	
+		ArrayList<String> algs;
+		try {
+			algs = imp.getAlgorithms();
+		} catch (ImplementorExcption e) {
+			throw  new AgentServiceException("can not get the algorithems of the implemntor"); 
+		} 
+		
+		StringBuilder ret=new StringBuilder(""); 
+		
+		for(String alg:algs){
+			ret.append(alg+","); 
+		}
+		
+		return ret.toString().substring(0,ret.length()-1); 
+	}
+
 
 	private void ImplemntorNameNotAvailable() {
 		// TODO Auto-generated method stub
