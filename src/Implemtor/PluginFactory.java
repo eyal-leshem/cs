@@ -88,14 +88,7 @@ public class PluginFactory
            throw new AgentServiceException(" not good path - no such dir :"+dicPath);
        }
        
-       //all the properties are encrypted  in file 
-       //here we decrypte that file
-       try{
-    	   propString = getPropStr();
-       }
-       catch (AgentServiceException e) {
-    	   throw new AgentServiceException("can't read propeties string from file",e); 
-       }
+
        
        //get the file list 
 	   files = dic.listFiles();
@@ -127,118 +120,8 @@ public class PluginFactory
 
    }
    
-   /*
-    * get the json string that contain the relevant properties to the "name"
-    */
-	private String getRelevantProprties(String propString ,String name) 
-	{
-		//any block of properties will statrt by "----"
-		//than will con the name 
-		//then "\n" 
-		//than the properties json string 
-		//examle "----yosi\n{"prop1":"1","prop2":"2"}
-		int satrtIndex=propString.indexOf("----"); 
-		
-		//run over all the properties block 
-		while(satrtIndex!=-1){
-			
-			//get the satrt of this properties block 
-			propString=propString.substring(satrtIndex+4); 
-			String propName= propString.substring(0,propString.indexOf("\n")); 
-			
-			//bingo 
-			if(propName.equals(name)){
-				propString=propString.substring(propString.indexOf("\n")+1,propString.indexOf("\n", propString.indexOf("\n")+1)); 
-				return propString; 
-			}
-			//next propeties block 
-			satrtIndex=propString.indexOf("----"); 
-		}
-		
-		return null;
-	}
 
-
-	private String getPropStr() 	throws AgentServiceException {
-		
-		String here=new File(".").getAbsolutePath(); 
-		 
 	
-		
-		File keyFile = new File(here+"\\plugins\\CA.ico"); 
-		byte[] keyBytes = new byte[(int)keyFile.length()]; 
-		
-		FileInputStream in;
-		try {
-			in = new FileInputStream(keyFile);
-		} catch (FileNotFoundException e) {
-			throw new AgentServiceException("can't genrate input steam from key file", e); 			
-		} 
-		
-		try {
-			in.read(keyBytes);
-		} catch (IOException e) {
-			throw new AgentServiceException("read the bytes from keyfile ", e); 	
-		} 
-		
-		try {
-			in.close();
-		} catch (IOException e) {} 
-		
-		SecretKeySpec keySpec;
-		try{
-			keySpec = new SecretKeySpec(keyBytes,"AES"); 
-		}catch (Exception e) {
-			throw new AgentServiceException("can't genrate create the secert key spec ", e); 	
-		}
-		
-		
-		Cipher c;
-		try {
-			c = Cipher.getInstance("AES");
-		} catch (Exception e){
-			throw new AgentServiceException("can't get istance of cipher ", e); 	
-		}
-		
-		
-		try {
-			c.init(Cipher.DECRYPT_MODE, keySpec);
-		} catch (InvalidKeyException e) {
-			throw new AgentServiceException("can't init the chiper ", e); 
-		}
-		
-		 
-		 
-		//the file of the that contain the properties 
-		File file = new File(here+"\\prop"); 
-		
-		if(!file.exists()){
-			return ""; 
-		}
-		
-		byte[] arr = new byte[(int)file.length()];
-		
-		
-		try{
-			FileInputStream fr = new FileInputStream(file); 
-			fr.read(arr); 
-		}
-		catch (IOException e) {
-			throw new AgentServiceException("can't get content of the prop string", e); 
-		}
-		 
-		byte[] encData;
-		try {
-			encData = c.doFinal(arr);
-		} catch (Exception e){
-			throw new AgentServiceException("can't decrypt the propeties file ", e); 
-		}
-		
-		String ans = new String(encData); 
-		return ans;
-		    
-	}
-
 	
 	/**
 	 * Method for getting the constructor instance of the jar file sending him the
@@ -255,8 +138,7 @@ public class PluginFactory
 		//get the name of jar
 		str = str.substring(0, str.indexOf(".jar"));
 		
-		//get the properties for constructor
-        String props = getRelevantProprties(propString, str); 
+		
         urls = new URL[1];
         urls[0] = url;
         classLoader = new URLClassLoader(urls);
@@ -275,25 +157,7 @@ public class PluginFactory
 		
 		return aClass; 
 		
-        /*
-        Class[] types = new Class[1]; 
-        types[0] = String.class; 
-        
-        Constructor constructor;
-        
-        //get the constracrtor 
-		try {
-			constructor = aClass.getConstructor(types);
-		} catch (Exception e){
-			throw new AgentServiceException("problem get the class c-tor",e); 
-		}
-		
-        try {
-			return constructor.newInstance(props);
-		} catch (Exception e){
-			System.out.println(e.getCause());
-			throw new AgentServiceException("problem to get new intance of the class",e); 
-		}*/
+
 	}
 	
 	
@@ -309,8 +173,7 @@ public class PluginFactory
 	{
 		File fileObj = new File(path);
 	     
-		propString=getPropStr();
-		
+				
 		if(!(path.endsWith(".jar")))
 		{
 			return null;

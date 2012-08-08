@@ -6,9 +6,16 @@ public class ExceptionHelper {
 	  * Defines a custom format for the stack trace as String.
 	  */
 	  public static String getCustomStackTrace(Throwable aThrowable) {
+		  
+		 
 	    
 		 //add the class name and any message passed to constructor
 	    StringBuilder result = new StringBuilder( "full stack trace: " );
+	    
+	    if(aThrowable.getCause()!=null &&   aThrowable.getCause()!=aThrowable){
+			  result.append(getCustomStackTrace(aThrowable.getCause())); 
+		  }
+	    
 	    result.append(aThrowable.toString());
 	    String NEW_LINE = System.getProperty("line.separator");
 	    result.append(NEW_LINE);
