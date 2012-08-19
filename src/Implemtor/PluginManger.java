@@ -210,12 +210,14 @@ public class PluginManger implements Observer {
 			ret.append(alg+","); 
 		}
 		
-		return ret.toString().substring(0,ret.length()-1); 
+		if(ret.toString().length()>0)
+			return ret.toString().substring(0,ret.length()-1); 
+		return ""; 
 	}
 
 
 	private void ImplemntorNameNotAvailable() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	
